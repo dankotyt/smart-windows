@@ -1,0 +1,65 @@
+package ru.pin36bik.controller;
+
+import ru.pin36bik.dto.UserDTO;
+import ru.pin36bik.dto.UserLoginDTO;
+import ru.pin36bik.dto.UserRegistrationDTO;
+import ru.pin36bik.entity.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
+import ru.pin36bik.service.UserService;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/user")
+public class UserController {
+    private final UserService userService;
+
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<UserDTO> registerUser(@RequestBody UserRegistrationDTO registrationDTO) {
+        return new ResponseEntity<>(userService.registerUser(registrationDTO), HttpStatus.OK);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<UserDTO> loginUser(@RequestBody UserLoginDTO userLoginDTO) {
+        UserDTO userDTO = userService.authorizeUser(userLoginDTO);
+        return new ResponseEntity<>(userDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/get_users")
+    public ResponseEntity<List<User>> getUsers() {
+        return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<UserDTO> updateCurrentUser(@AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody UserDTO userDTO) {
+        UserDTO updatedUser = userService.updateCurrentUser(userDetails.getUsername(), userDTO);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> deleteAndArchiveCurrentUser(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        String email = userDetails.getUsername();
+        userService.deleteAndArchiveUser(email);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    //Возможно, понадобиться при тестах
+//    @DeleteMapping("/{email}")
+//    public HttpStatus deleteCurrentUser(@PathVariable("id") String email) {
+//        userService.deleteUser(email);
+//        return HttpStatus.OK;
+//    }
+
+}
