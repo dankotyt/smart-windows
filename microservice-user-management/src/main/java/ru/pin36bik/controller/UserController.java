@@ -40,6 +40,16 @@ public class UserController {
         return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
 
+    @GetMapping("/get_user_by_id")
+    public ResponseEntity<User> getUserById(@RequestParam("id") Long id) {
+        return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/get_user_by_email")
+    public ResponseEntity<User> getUserByEmail(@RequestParam("email") String email) {
+        return new ResponseEntity<>(userService.getUserByEmail(email), HttpStatus.OK);
+    }
+
     @PutMapping("/update")
     public ResponseEntity<UserDTO> updateCurrentUser(@AuthenticationPrincipal UserDetails userDetails,
             @RequestBody UserDTO userDTO) {

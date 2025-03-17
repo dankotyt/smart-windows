@@ -1,5 +1,6 @@
 package ru.pin36bik.service;
 
+import org.springframework.transaction.annotation.Transactional;
 import ru.pin36bik.dto.UserLoginDTO;
 import ru.pin36bik.dto.UserRegistrationDTO;
 import ru.pin36bik.entity.ArchivedUser;
@@ -69,6 +70,16 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found!"));
+    }
+
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found!"));
+    }
+
     public UserDTO updateCurrentUser(String email, UserDTO userDTO) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found!"));
@@ -93,6 +104,7 @@ public class UserService implements UserDetailsService {
         return convertToDTO(user);
     }
 
+    @Transactional
     public void deleteAndArchiveUser(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found!"));
@@ -114,6 +126,17 @@ public class UserService implements UserDetailsService {
         userDTO.setLastName(user.getLastName());
         userDTO.setEmail(user.getEmail());
         return userDTO;
+    }
+
+    public User convertToEntity(UserDTO userDTO) {
+        User user = new User();
+        user.setName(userDTO.getName());
+        user.setLastName(userDTO.getLastName());
+        user.setBirthday(userDTO.getBirthday());
+        user.setEmail(userDTO.getEmail());
+        user.setPassword("defaultPassword"); // Установите пароль по умолчанию или используйте реальный пароль
+        user.setCreatedAt(LocalDateTime.now());
+        return user;
     }
 
     @Override

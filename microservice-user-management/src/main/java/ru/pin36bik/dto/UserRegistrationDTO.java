@@ -1,5 +1,6 @@
 package ru.pin36bik.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -14,6 +15,7 @@ public class UserRegistrationDTO {
     private String name;
     private String lastName;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;
 
     @Email(message = "Invalid email format!")

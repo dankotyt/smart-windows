@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import jakarta.persistence.*;
+import ru.pin36bik.entity.User;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
