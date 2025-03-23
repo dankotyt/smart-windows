@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/mydatabase
+    url: jdbc:postgresql://localhost:5432/smart_windows
     username: ${BD_LOGIN}
     password: ${BD_PASSWORD}
   jpa:

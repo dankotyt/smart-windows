@@ -13,6 +13,9 @@ public class Preset {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "PresetName")
+    private String PresetName;
+
     @Column(name = "VentilationFlag")
     private Boolean VentilationFlag;
 

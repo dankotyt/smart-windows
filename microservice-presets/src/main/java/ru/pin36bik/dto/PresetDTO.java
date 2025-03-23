@@ -10,6 +10,9 @@ public class PresetDTO {
     private Long id;
 
     @NotNull
+    private String PresetName;
+
+    @NotNull
     private Boolean VentilationFlag;
 
     @NotNull
