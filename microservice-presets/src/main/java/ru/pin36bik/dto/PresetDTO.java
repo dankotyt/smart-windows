@@ -23,4 +23,13 @@ public class PresetDTO {
 
     @NotNull
     private Integer FrameColor;
+
+    public PresetDTO(Long presetID, String presetName, Boolean ventilationFlag, Integer ventilationTimer, Integer darknessValue, Integer frameColor) {
+        this.id = presetID;
+        this.PresetName = presetName;
+        this.VentilationFlag = ventilationFlag;
+        this.VentilationTimer = ventilationTimer;
+        this.DarknessValue = darknessValue;
+        this.FrameColor = frameColor;
+    }
 }

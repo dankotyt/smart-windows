@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import ru.pin36bik.service.UserService;
+import ru.pin36bik.service.KafkaProducerService;
 
 import java.util.List;
 
@@ -18,10 +19,12 @@ import java.util.List;
 @RequestMapping("/user")
 public class UserController {
     private final UserService userService;
+    private final KafkaProducerService kafkaProducerService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, KafkaProducerService kafkaProducerService) {
         this.userService = userService;
+        this.kafkaProducerService = kafkaProducerService;
     }
 
     @PostMapping("/register")
@@ -48,6 +51,11 @@ public class UserController {
     @GetMapping("/get_user_by_email")
     public ResponseEntity<User> getUserByEmail(@RequestParam("email") String email) {
         return new ResponseEntity<>(userService.getUserByEmail(email), HttpStatus.OK);
+    }
+
+    @GetMapping("/get-preset/{presetName}")
+    public void getPresetByName(@PathVariable String presetName) {
+        kafkaProducerService.sendPresetRequest(presetName);
     }
 
     @PutMapping("/update")

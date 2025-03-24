@@ -1,3 +1,5 @@
 spring:
   application:
     name: smart-windows
+  kafka:
+    bootstrap-servers: localhost:9092
