@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.*;
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-class UserControllerTest {
+class UserTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -60,6 +60,8 @@ class UserControllerTest {
 
     private ObjectMapper objectMapper;
 
+    private Long userId;
+
     @BeforeEach
     void setUp() {
         userRepository.deleteAll();
@@ -74,6 +76,8 @@ class UserControllerTest {
         user.setCreatedAt(LocalDateTime.now());
 
         userRepository.save(user);
+
+        userId = user.getUserId();
 
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
@@ -105,6 +109,34 @@ class UserControllerTest {
         Optional<User> savedUser = userRepository.findByEmail("john.smith@gmail.com");
         assertTrue(savedUser.isPresent());
         assertEquals("John", savedUser.get().getName());
+    }
+
+    @Test
+    void testRegisterUserWithExistingEmail() throws Exception {
+        // Создаем пользователя с email "john.smith@gmail.com"
+        User existingUser = new User();
+        existingUser.setName("Existing");
+        existingUser.setLastName("User");
+        existingUser.setBirthday(LocalDate.of(1990, 1, 1));
+        existingUser.setEmail("john.smith@gmail.com");
+        existingUser.setPassword(passwordEncoder.encode("password"));
+        existingUser.setCreatedAt(LocalDateTime.now());
+        userRepository.save(existingUser);
+
+        // Пытаемся зарегистрировать нового пользователя с тем же email
+        UserRegistrationDTO registrationDTO = new UserRegistrationDTO();
+        registrationDTO.setName("John");
+        registrationDTO.setLastName("Smith");
+        registrationDTO.setBirthday(LocalDate.of(1990, 1, 1));
+        registrationDTO.setEmail("john.smith@gmail.com");
+        registrationDTO.setPassword("password");
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/user/register")
+                        .with(csrf().asHeader()) // Добавляем CSRF-токен в заголовок
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(registrationDTO)))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest()) // Ожидаем статус 400
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("The user has already existed with this email!"));
     }
 
     @Test
@@ -149,8 +181,27 @@ class UserControllerTest {
 
     @Test
     void testGetUserByEmail() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/user/get_user_by_email")
-                        .param("email", "test@gmail.com")
+        User user = userRepository.findByEmail("test@gmail.com")
+                .orElseThrow(() -> new RuntimeException("User not found!"));
+
+        String email = user.getEmail();
+        mockMvc.perform(MockMvcRequestBuilders.get("/user/get_by_email/{email}",
+                                email) // Используем {email} для PathVariable
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Test"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value("User"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email").value("test@gmail.com"));
+    }
+
+    @Test
+    void testGetUserById() throws Exception {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found!"));
+
+        Long userId = user.getUserId();
+        mockMvc.perform(MockMvcRequestBuilders.get("/user/get_by_id/{id}",
+                                userId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Test"))
@@ -178,9 +229,15 @@ class UserControllerTest {
     @Test
     @WithMockUser(username = "test@gmail.com")
     void testDeleteCurrentUser() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.delete("/user/delete")
+        User user = userRepository.findByEmail("test@gmail.com")
+                .orElseThrow(() -> new RuntimeException("User not found!"));
+
+        Long userId = user.getUserId();
+        mockMvc.perform(MockMvcRequestBuilders.delete("/user/delete/{id}",
+                                userId) // Используем {id} для PathVariable
                         .with(csrf())) // Добавляем CSRF-токен
                 .andExpect(MockMvcResultMatchers.status().isOk());
+
         assertFalse(userRepository.existsByEmail("test@gmail.com"));
     }
 

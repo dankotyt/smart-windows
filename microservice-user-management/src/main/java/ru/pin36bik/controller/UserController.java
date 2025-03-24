@@ -40,13 +40,13 @@ public class UserController {
         return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
 
-    @GetMapping("/get_user_by_id")
-    public ResponseEntity<User> getUserById(@RequestParam("id") Long id) {
+    @GetMapping("/get_by_id/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
         return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
     }
 
-    @GetMapping("/get_user_by_email")
-    public ResponseEntity<User> getUserByEmail(@RequestParam("email") String email) {
+    @GetMapping("/get_by_email/{email}")
+    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
         return new ResponseEntity<>(userService.getUserByEmail(email), HttpStatus.OK);
     }
 
@@ -57,10 +57,11 @@ public class UserController {
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteAndArchiveCurrentUser(
-            @AuthenticationPrincipal UserDetails userDetails) {
-        String email = userDetails.getUsername();
+            @PathVariable Long id) {
+        User user = userService.getUserById(id);
+        String email = user.getUsername();
         userService.deleteAndArchiveUser(email);
         return new ResponseEntity<>(HttpStatus.OK);
     }

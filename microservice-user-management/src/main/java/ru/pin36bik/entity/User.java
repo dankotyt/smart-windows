@@ -4,9 +4,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,7 +27,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private long userId;
 
     @Column(nullable = false)
     private String name;
@@ -47,40 +47,16 @@ public class User implements UserDetails {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    //location по API
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList(); // Возвращает роли пользователя
+        return List.of();
     }
 
     @Override
     public String getUsername() {
-        return email; // Используем email как username
+        return email;
     }
 
-    @Override
-    public String getPassword() {
-        return password; // Возвращаем пароль
-    }
+    //location по API
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true; // Аккаунт не просрочен
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true; // Аккаунт не заблокирован
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true; // Пароль не просрочен
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true; // Аккаунт активен
-    }
 }

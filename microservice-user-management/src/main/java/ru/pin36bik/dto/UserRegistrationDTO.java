@@ -2,13 +2,18 @@ package ru.pin36bik.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
 
 import jakarta.validation.constraints.Email;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.stereotype.Component;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Data
+@Component
+@Getter
+@Setter
 public class UserRegistrationDTO {
 
     @NotNull(message = "Name could not be null!")

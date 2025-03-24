@@ -1,7 +1,9 @@
 package ru.pin36bik.dto;
 
 import jakarta.validation.constraints.Email;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
@@ -10,7 +12,9 @@ import java.time.LocalDate;
  * и клиентом. Тут находятся те данные, которые пользователь
  * сможет увидеть.
  * */
-@Data
+@Component
+@Getter
+@Setter
 public class UserDTO {
     private String name;
     private String lastName;

@@ -128,17 +128,6 @@ public class UserService implements UserDetailsService {
         return userDTO;
     }
 
-    public User convertToEntity(UserDTO userDTO) {
-        User user = new User();
-        user.setName(userDTO.getName());
-        user.setLastName(userDTO.getLastName());
-        user.setBirthday(userDTO.getBirthday());
-        user.setEmail(userDTO.getEmail());
-        user.setPassword("defaultPassword"); // Установите пароль по умолчанию или используйте реальный пароль
-        user.setCreatedAt(LocalDateTime.now());
-        return user;
-    }
-
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
@@ -146,6 +135,5 @@ public class UserService implements UserDetailsService {
 
         return user;
     }
-
 
 }

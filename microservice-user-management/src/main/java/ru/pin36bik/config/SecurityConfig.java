@@ -30,7 +30,8 @@ public class SecurityConfig {
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers("/user/register").permitAll()
                 .requestMatchers("/user/get_users").permitAll()
-                .requestMatchers("/user/get_user_by_email").permitAll()
+                .requestMatchers("/user/get_by_email/{email}").permitAll()
+                .requestMatchers("/user/get_by_id/{id}").permitAll()
                 .anyRequest().authenticated() // Все остальные запросы требуют аутентификации
         );
 
@@ -44,7 +45,8 @@ public class SecurityConfig {
         private final List<AntPathRequestMatcher> excludedMatchers = Arrays.asList(
                 new AntPathRequestMatcher("/user/register", "POST"),
                 new AntPathRequestMatcher("/user/get_users", "GET"),
-                new AntPathRequestMatcher("/user/get_user_by_email", "GET")
+                new AntPathRequestMatcher("/user/get_by_email/{email}", "GET"),
+                new AntPathRequestMatcher("/user/get_by_id/{id}", "GET")
         );
 
         @Override
