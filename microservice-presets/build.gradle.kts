@@ -26,6 +26,7 @@ dependencies {
     implementation("io.github.cdimascio:dotenv-java:3.0.0")
     annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
 }
 
 tasks.test {

@@ -18,3 +18,12 @@ spring:
     bootstrap-servers: localhost:9092
     topic:
       name: tuple-topic
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tagsSorter: alpha
+    operationsSorter: alpha
+  api-docs:
+    path: /api-docs
+  show-actuator: true
