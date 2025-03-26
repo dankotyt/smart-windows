@@ -13,8 +13,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public class PresetDTO {
     @Schema(
             description = "Уникальный идентификатор пресета",
-            example = "1"
-            // accessMode = Schema.AccessMode.READ_ONLY
+            example = "1",
+            accessMode = Schema.AccessMode.READ_ONLY
     )
     private Long id;
 
