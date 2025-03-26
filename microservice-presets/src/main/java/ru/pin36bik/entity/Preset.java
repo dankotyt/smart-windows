@@ -13,18 +13,18 @@ public class Preset {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "PresetName")
-    private String PresetName;
+    @Column(name = "presetName")
+    private String presetName;
 
-    @Column(name = "VentilationFlag")
-    private Boolean VentilationFlag;
+    @Column(name = "ventilationFlag")
+    private Boolean ventilationFlag;
 
-    @Column(name = "VentilationTimer")
-    private Integer VentilationTimer;
+    @Column(name = "ventilationTimer")
+    private Integer ventilationTimer;
 
-    @Column(name = "DarknessValue")
-    private Integer DarknessValue;
+    @Column(name = "darknessValue")
+    private Integer darknessValue;
 
-    @Column(name = "FrameColor")
-    private Integer FrameColor;
+    @Column(name = "frameColor")
+    private Integer frameColor;
 }
