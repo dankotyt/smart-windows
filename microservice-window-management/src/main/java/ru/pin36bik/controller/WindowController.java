@@ -17,10 +17,10 @@ public class WindowController {
         this.windowService = windowService;
     }
 
-    @PostMapping("/add-window")
-    public ResponseEntity<WindowUserDTO> addWindow(@RequestHeader() String token,
-                                                   @RequestBody AddW) {
-
-    }
+//    @PostMapping("/add-window")
+//    public ResponseEntity<WindowUserDTO> addWindow(@RequestHeader() String token,
+//                                                   @RequestBody AddW) {
+//
+//    }
 
 }

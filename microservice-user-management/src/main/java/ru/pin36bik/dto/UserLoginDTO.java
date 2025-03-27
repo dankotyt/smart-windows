@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Setter
 public class UserLoginDTO {
 
-    @Email(message = "Invalid email format!")
+    @Email(message = "Некорректный email!")
     private String email;
     private String password;
 }

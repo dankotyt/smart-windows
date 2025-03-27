@@ -10,3 +10,10 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+jwt:
+  secret: ${JWT_SECRET}
+  access:
+    ttl: ${JWT_ACCESS_EXPIRATION}
+  refresh:
+    ttl: ${JWT_REFRESH_EXPIRATION}

@@ -20,6 +20,6 @@ public class UserDTO {
     private String lastName;
     private LocalDate birthday;
 
-    @Email(message = "Invalid email format!")
+    @Email(message = "Некорректный email!")
     private String email;
 }

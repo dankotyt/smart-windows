@@ -1,5 +1,8 @@
 package ru.pin36bik.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import ru.pin36bik.dto.UserDTO;
 import ru.pin36bik.dto.UserLoginDTO;
 import ru.pin36bik.dto.UserRegistrationDTO;
@@ -10,19 +13,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import ru.pin36bik.security.jwt.JwtTokenParser;
 import ru.pin36bik.service.UserService;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/user")
+@RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+    private final AuthController authController;
 
     @PostMapping("/register")
     public ResponseEntity<UserDTO> registerUser(@RequestBody UserRegistrationDTO registrationDTO) {
@@ -41,7 +43,7 @@ public class UserController {
     }
 
     @GetMapping("/get_by_id/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+    public ResponseEntity<User> getUserById(@PathVariable UUID id) {
         return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
     }
 
@@ -59,18 +61,11 @@ public class UserController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteAndArchiveCurrentUser(
-            @PathVariable Long id) {
+            @PathVariable UUID id, HttpServletResponse response) {
         User user = userService.getUserById(id);
         String email = user.getUsername();
         userService.deleteAndArchiveUser(email);
+        response.addCookie(authController.createExpiredCookie());
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
-    //Возможно, понадобиться при тестах
-//    @DeleteMapping("/{email}")
-//    public HttpStatus deleteCurrentUser(@PathVariable("id") String email) {
-//        userService.deleteUser(email);
-//        return HttpStatus.OK;
-//    }
-
 }

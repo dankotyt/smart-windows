@@ -18,8 +18,8 @@ public class WindowService {
         this.userRepository = userRepository;
     }
 
-    public WindowUserDTO addWindowToUser(String windowId, String userId, String name,
-                                         String location) {
-
-    }
+//    public WindowUserDTO addWindowToUser(String windowId, String userId, String name,
+//                                         String location) {
+//
+//    }
 }

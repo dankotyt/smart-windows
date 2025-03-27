@@ -16,14 +16,14 @@ import java.time.LocalDateTime;
 @Setter
 public class UserRegistrationDTO {
 
-    @NotNull(message = "Name could not be null!")
+    @NotNull(message = "Поле не может быть пустым!")
     private String name;
     private String lastName;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;
 
-    @Email(message = "Invalid email format!")
+    @Email(message = "Некорректный email!")
     private String email;
 
     private String password;

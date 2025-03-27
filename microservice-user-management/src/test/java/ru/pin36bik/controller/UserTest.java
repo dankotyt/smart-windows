@@ -3,6 +3,7 @@ package ru.pin36bik.controller;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -60,7 +61,7 @@ class UserTest {
 
     private ObjectMapper objectMapper;
 
-    private Long userId;
+    private UUID userId;
 
     @BeforeEach
     void setUp() {
@@ -199,9 +200,9 @@ class UserTest {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found!"));
 
-        Long userId = user.getUserId();
+        userId = user.getUserId();
         mockMvc.perform(MockMvcRequestBuilders.get("/user/get_by_id/{id}",
-                                userId)
+                                userId.toString())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Test"))
@@ -232,9 +233,9 @@ class UserTest {
         User user = userRepository.findByEmail("test@gmail.com")
                 .orElseThrow(() -> new RuntimeException("User not found!"));
 
-        Long userId = user.getUserId();
+        userId = user.getUserId();
         mockMvc.perform(MockMvcRequestBuilders.delete("/user/delete/{id}",
-                                userId) // Используем {id} для PathVariable
+                                userId.toString()) // Используем {id} для PathVariable
                         .with(csrf())) // Добавляем CSRF-токен
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
