@@ -3,6 +3,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/users_db
     username: ${USER_DB_LOGIN} #${ALL_PRIVILEGES_USER_LOGIN}
     password: ${USER_DB_PASSWORD} #${ALL_PRIVILEGES_USER_PASSWORD}
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
@@ -10,10 +11,11 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        #default_schema: app_schema
+    database: postgresql
 
 jwt:
   secret: ${JWT_SECRET}
-  access:
-    ttl: ${JWT_ACCESS_EXPIRATION}
-  refresh:
-    ttl: ${JWT_REFRESH_EXPIRATION}
+  access-ttl: ${JWT_ACCESS_EXPIRATION}
+  refresh-ttl: ${JWT_REFRESH_EXPIRATION}

@@ -9,7 +9,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -17,8 +16,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import ru.pin36bik.entity.User;
 import ru.pin36bik.repository.UserRepository;
 import ru.pin36bik.security.jwt.JwtTokenParser;
-import ru.pin36bik.service.AuthService;
-import ru.pin36bik.service.UserService;
 
 import java.io.IOException;
 
@@ -31,7 +28,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtTokenParser jwtTokenParser;
     private final UserRepository userRepository;
-    //private final AuthService authService;
 
     @Override
     protected void doFilterInternal(
@@ -41,11 +37,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         try {
             String jwt = extractToken(request);
+            String username = jwtTokenParser.extractUsername(jwt);
+            User user = userRepository.findByEmail(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            if (jwt != null && jwtTokenParser.isTokenValid(jwt, user)) {
 
-            if (jwt != null && jwtTokenParser.isTokenValid(jwt)) {
-                String username = jwtTokenParser.extractUsername(jwt);
-                User user = userRepository.findByEmail(username)
-                        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         user,
                         null,
@@ -63,7 +59,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     private String extractToken(HttpServletRequest request) {
-        String header = request.getHeader(AUTH_HEADER);
+        final String header = request.getHeader(AUTH_HEADER);
         if (header != null && header.startsWith(TOKEN_PREFIX)) {
             return header.substring(TOKEN_PREFIX.length());
         }

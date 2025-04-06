@@ -74,7 +74,7 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден!"));
     }
 
-    public User getUserById(UUID id) {
+    public User getUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден!"));
     }

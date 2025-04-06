@@ -2,6 +2,7 @@ package ru.pin36bik.config;
 
 import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -11,8 +12,10 @@ import ru.pin36bik.security.jwt.JwtTokenParser;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 @Configuration
+@RequiredArgsConstructor
 @Getter
 @Setter
 @ConfigurationProperties(prefix = "jwt")
@@ -29,7 +32,8 @@ public class JwtConfig {
 
     @Bean
     public SecretKey secretKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        byte[] decodedKey = Base64.getDecoder().decode(secret);
+        return Keys.hmacShaKeyFor(decodedKey);
     }
 
     @Bean

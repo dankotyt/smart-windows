@@ -18,6 +18,7 @@ public class JwtTokenFactory {
     public String createAccessToken(User user) {
 
         return Jwts.builder()
+                .claim("userId", user.getUserId())
                 .subject(user.getEmail())
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(Date.from(Instant.now().plusMillis(accessTtl)))

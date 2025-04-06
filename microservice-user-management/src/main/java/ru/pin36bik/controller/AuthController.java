@@ -12,7 +12,6 @@ import ru.pin36bik.dto.AuthResponseDTO;
 import ru.pin36bik.entity.User;
 import ru.pin36bik.exceptions.InvalidTokenException;
 import ru.pin36bik.security.jwt.JwtTokenFactory;
-import ru.pin36bik.security.jwt.JwtTokenParser;
 import ru.pin36bik.service.AuthService;
 import ru.pin36bik.service.UserService;
 
@@ -27,7 +26,6 @@ public class AuthController {
     private final JwtConfig jwtConfig;
     private final JwtTokenFactory jwtTokenFactory;
     private final AuthService authService;
-    private final JwtTokenParser jwtTokenParser;
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(
@@ -55,6 +53,10 @@ public class AuthController {
             @CookieValue("__Host-refresh") String refreshToken,
             HttpServletResponse response
     ) {
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            response.addCookie(createExpiredCookie());
+            throw new InvalidTokenException("Refresh token отсутствует!");
+        }
         try {
             AuthResponseDTO authResponse = authService.refreshToken(refreshToken);
 
@@ -72,9 +74,11 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@CookieValue("__Host-jwt") String token,
-                                       HttpServletResponse response) {
-        jwtTokenParser.blacklistToken(token);
+    public ResponseEntity<Void> logout(
+            @CookieValue("__Host-refresh") String refreshToken,
+            HttpServletResponse response
+    ) {
+        authService.logout(refreshToken);
         response.addCookie(createExpiredCookie());
         return ResponseEntity.ok().build();
     }

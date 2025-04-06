@@ -3,58 +3,50 @@ package ru.pin36bik.security.jwt;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
+import ru.pin36bik.entity.User;
 import ru.pin36bik.exceptions.InvalidTokenException;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 @RequiredArgsConstructor
 public class JwtTokenParser {
     private final SecretKey secretKey;
-    private final Set<String> blacklistedTokens = ConcurrentHashMap.newKeySet();
 
     public String extractUsername(String token) {
-        return parseToken(token).getSubject();
+        return extractClaim(token, Claims::getSubject);
     }
 
-    public boolean isTokenValid(String token) {
-        try {
-            if (isTokenBlacklisted(token)) {
-                return false;
-            }
-            return !isTokenExpired(token);
-        } catch (Exception e) {
-            return false;
-        }
+    public  <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = parseToken(token);
+        return claimsResolver.apply(claims);
+    }
 
+    private  Claims parseToken(String token) {
+        try {
+            return Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        } catch (Exception e) {
+            throw new InvalidTokenException("Неверный JWT токен: " + e.getMessage());
+        }
+    }
+
+    public boolean isTokenValid(String token, User user) {
+        final String username = extractUsername(token);
+        return username.equals(user.getUsername()) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
-        return parseToken(token).getExpiration().before(new Date());
+        return extractExpiration(token).before(new Date());
     }
 
-    public void blacklistToken(String token) {
-        blacklistedTokens.add(token);
-    }
-
-    public boolean isTokenBlacklisted(String token) {
-        if (!blacklistedTokens.contains(token)) {
-            throw new InvalidTokenException("Invalid token");
-        }
-        return blacklistedTokens.contains(token);
-    }
-
-    private Claims parseToken(String token) {
-        return Jwts.parser()
-                .verifyWith(secretKey)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
-    }
-
-    public String getUsernameFromToken(String token) {
-        return extractUsername(token);
+    private Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
     }
 }

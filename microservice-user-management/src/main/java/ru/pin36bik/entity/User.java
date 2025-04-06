@@ -4,33 +4,32 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.UuidGenerator;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
-/**
- * User - сущность, которая будет передаваться в БД.
- * Отличается от UserDTO только тем, что тут хранятся те данные,
- * которые пользователь не увидит.
- * */
+import ru.pin36bik.entity.role.Role;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "users")
+@Builder
+@AllArgsConstructor
+@Table(name = "users", schema = "app_schema")
 public class User implements UserDetails {
     @Id
-    @GeneratedValue(generator = "UUID")
-    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_seq")
+    @SequenceGenerator(
+            name = "users_seq",
+            sequenceName = "app_schema.users_seq",
+            allocationSize = 50
+    )
+    //@UuidGenerator(style = UuidGenerator.Style.RANDOM)
     @Column(updatable = false, unique = true, name = "id")
-    private UUID userId;
+    private Long userId;
 
     @Column(nullable = false)
     private String name;
@@ -41,7 +40,7 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private LocalDate birthday;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String email;
 
     @Column(nullable = false)
@@ -56,9 +55,12 @@ public class User implements UserDetails {
     @Column(name = "refresh_token_expiry")
     private LocalDateTime refreshTokenExpiry;
 
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override
@@ -68,22 +70,22 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 
     @Override

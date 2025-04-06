@@ -18,7 +18,6 @@ public class MicroserviceUsersApplication {
         System.out.println("ALL_PRIVILEGES_USER_LOGIN: " + dotenv.get("ALL_PRIVILEGES_USER_LOGIN"));
         System.out.println("ALL_PRIVILEGES_USER_PASSWORD: " + dotenv.get("ALL_PRIVILEGES_USER_PASSWORD"));
 
-
         dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
         SpringApplication.run(MicroserviceUsersApplication.class, args);
     }

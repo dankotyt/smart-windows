@@ -43,7 +43,7 @@ public class UserController {
     }
 
     @GetMapping("/get_by_id/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable UUID id) {
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
         return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
     }
 
@@ -61,7 +61,7 @@ public class UserController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteAndArchiveCurrentUser(
-            @PathVariable UUID id, HttpServletResponse response) {
+            @PathVariable Long id, HttpServletResponse response) {
         User user = userService.getUserById(id);
         String email = user.getUsername();
         userService.deleteAndArchiveUser(email);

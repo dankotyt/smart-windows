@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Table(name = "archived_users")
 public class ArchivedUser {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Column(nullable = false)
