@@ -31,8 +31,6 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final ArchivedUserRepository archivedUserRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtConfig jwtConfig;
-    private final JwtTokenFactory jwtTokenFactory;
     //private final EmailService emailService // для восстановления пароля
 
     public UserDTO registerUser(RegistrationRequest registrationDTO) {
@@ -46,7 +44,6 @@ public class UserService implements UserDetailsService {
         user.setBirthday(registrationDTO.getBirthday());
         user.setEmail(registrationDTO.getEmail());
         user.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
-        user.setCreatedAt(LocalDateTime.now(Clock.systemUTC()));
 
         userRepository.save(user);
 
@@ -112,7 +109,6 @@ public class UserService implements UserDetailsService {
         au.setBirthday(user.getBirthday());
         au.setEmail(user.getEmail());
         au.setCreatedAt(user.getCreatedAt());
-        au.setDeletedAt(LocalDateTime.now(Clock.systemUTC()));
         archivedUserRepository.save(au);
         userRepository.delete(user);
     }
@@ -127,9 +123,7 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email)
+        return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден с таким email: " + email));
-
-        return user;
     }
 }
