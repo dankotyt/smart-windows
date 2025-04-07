@@ -3,22 +3,19 @@ package ru.pin36bik.controller;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import org.junit.jupiter.api.BeforeEach;
 
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
 import ru.pin36bik.MicroserviceUsersApplication;
 import ru.pin36bik.dto.UserDTO;
-import ru.pin36bik.dto.UserLoginDTO;
-import ru.pin36bik.dto.UserRegistrationDTO;
+import ru.pin36bik.dto.LoginRequest;
+import ru.pin36bik.dto.RegistrationRequest;
 import ru.pin36bik.entity.ArchivedUser;
 import ru.pin36bik.entity.User;
 import ru.pin36bik.repository.ArchivedUserRepository;
@@ -95,7 +92,7 @@ class UserTest {
     @Test
     void testRegisterUser() throws Exception {
 
-        UserRegistrationDTO registrationDTO = new UserRegistrationDTO();
+        RegistrationRequest registrationDTO = new RegistrationRequest();
         registrationDTO.setName("John");
         registrationDTO.setLastName("Smith");
         registrationDTO.setBirthday(LocalDate.of(1990, 1, 1));
@@ -128,7 +125,7 @@ class UserTest {
         userRepository.save(existingUser);
 
         // Пытаемся зарегистрировать нового пользователя с тем же email
-        UserRegistrationDTO registrationDTO = new UserRegistrationDTO();
+        RegistrationRequest registrationDTO = new RegistrationRequest();
         registrationDTO.setName("John");
         registrationDTO.setLastName("Smith");
         registrationDTO.setBirthday(LocalDate.of(1990, 1, 1));
@@ -146,7 +143,7 @@ class UserTest {
     @Test
     @WithMockUser
     void testAuthorizeUser() throws Exception {
-        UserLoginDTO loginDTO = new UserLoginDTO();
+        LoginRequest loginDTO = new LoginRequest();
         loginDTO.setEmail("test@gmail.com");
         loginDTO.setPassword("password");
 
@@ -163,7 +160,7 @@ class UserTest {
 
     @Test
     void testAuthorizeUserWithoutCsrf() throws Exception {
-        UserLoginDTO loginDTO = new UserLoginDTO();
+        LoginRequest loginDTO = new LoginRequest();
         loginDTO.setEmail("test@gmail.com");
         loginDTO.setPassword("password");
 

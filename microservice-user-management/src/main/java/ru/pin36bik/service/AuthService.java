@@ -5,8 +5,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import ru.pin36bik.config.JwtConfig;
-import ru.pin36bik.dto.AuthResponseDTO;
-import ru.pin36bik.dto.UserLoginDTO;
+import ru.pin36bik.dto.AuthResponse;
+import ru.pin36bik.dto.LoginRequest;
 import ru.pin36bik.entity.User;
 import ru.pin36bik.exceptions.InvalidTokenException;
 import ru.pin36bik.exceptions.UserNotFoundException;
@@ -34,30 +34,21 @@ public class AuthService {
 //                LocalDateTime.now().isBefore(user.getRefreshTokenExpiry());
 //    }
 
-    public void updateRefreshToken(String email, String refreshToken, LocalDateTime expiry) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден!"));
-
-        user.setRefreshToken(refreshToken);
-        user.setRefreshTokenExpiry(expiry);
-        userRepository.save(user);
-    }
-
-    public AuthResponseDTO authenticate(UserLoginDTO dto) {
+    public AuthResponse authenticate(LoginRequest loginDTO) {
         authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        dto.getEmail(),
-                        dto.getPassword()
+                        loginDTO.getEmail(),
+                        loginDTO.getPassword()
                 )
         );
 
-        User user = userRepository.findByEmail(dto.getEmail())
+        User user = userRepository.findByEmail(loginDTO.getEmail())
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден!"));
 
         return createNewTokenPair(user);
     }
 
-    public AuthResponseDTO refreshToken(String refreshToken) {
+    public AuthResponse refreshToken(String refreshToken) {
         String email = jwtTokenParser.extractUsername(refreshToken);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден!"));
@@ -74,17 +65,13 @@ public class AuthService {
         return createNewTokenPair(user);
     }
 
-    private AuthResponseDTO createNewTokenPair(User user) {
-        String newAccessToken = jwtTokenFactory.createAccessToken(user);
-        String newRefreshToken = jwtTokenFactory.createRefreshToken(user);
+    public void updateRefreshToken(String email, String refreshToken, LocalDateTime expiry) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден!"));
 
-        LocalDateTime refreshExpiry = LocalDateTime.now().plusSeconds(jwtConfig.getRefreshTtl() / 100);
-        updateRefreshToken(user.getEmail(), newRefreshToken, refreshExpiry);
-
-        return new AuthResponseDTO(
-                newAccessToken, // Access token тоже нужен!
-                userMapper.toDTO(user)
-        );
+        user.setRefreshToken(refreshToken);
+        user.setRefreshTokenExpiry(expiry);
+        userRepository.save(user);
     }
 
     public void logout(String refreshToken) {
@@ -93,5 +80,18 @@ public class AuthService {
                     user.setRefreshToken(null);
                     userRepository.save(user);
                 });
+    }
+
+    private AuthResponse createNewTokenPair(User user) {
+        String newAccessToken = jwtTokenFactory.createAccessToken(user);
+        String newRefreshToken = jwtTokenFactory.createRefreshToken(user);
+
+        LocalDateTime refreshExpiry = LocalDateTime.now().plusSeconds(jwtConfig.getRefreshTtl() / 100);
+        updateRefreshToken(user.getEmail(), newRefreshToken, refreshExpiry);
+
+        return new AuthResponse(
+                newAccessToken, // Access token тоже нужен!
+                userMapper.toDTO(user)
+        );
     }
 }

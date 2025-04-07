@@ -3,12 +3,11 @@ package ru.pin36bik.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import ru.pin36bik.config.JwtConfig;
-import ru.pin36bik.dto.UserLoginDTO;
-import ru.pin36bik.dto.UserRegistrationDTO;
+import ru.pin36bik.dto.LoginRequest;
+import ru.pin36bik.dto.RegistrationRequest;
 import ru.pin36bik.entity.ArchivedUser;
 import ru.pin36bik.exceptions.IncorrectPasswordException;
 import ru.pin36bik.exceptions.EmailBusyException;
-import ru.pin36bik.exceptions.InvalidTokenException;
 import ru.pin36bik.exceptions.UserNotFoundException;
 import ru.pin36bik.entity.User;
 import ru.pin36bik.dto.UserDTO;
@@ -24,7 +23,6 @@ import ru.pin36bik.security.jwt.JwtTokenFactory;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +35,7 @@ public class UserService implements UserDetailsService {
     private final JwtTokenFactory jwtTokenFactory;
     //private final EmailService emailService // для восстановления пароля
 
-    public UserDTO registerUser(UserRegistrationDTO registrationDTO) {
+    public UserDTO registerUser(RegistrationRequest registrationDTO) {
         if (userRepository.existsByEmail(registrationDTO.getEmail())) {
             throw new EmailBusyException("The user has already existed with this email!");
         }
@@ -55,10 +53,10 @@ public class UserService implements UserDetailsService {
         return convertToDTO(user);
     }
 
-    public UserDTO authorizeUser(UserLoginDTO userLoginDTO) {
-        User user = userRepository.findByEmail(userLoginDTO.getEmail())
+    public UserDTO authorizeUser(LoginRequest loginRequest) {
+        User user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден!"));
-        if (!passwordEncoder.matches(userLoginDTO.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             throw new IncorrectPasswordException("Неверный пароль");
         }
         return convertToDTO(user);

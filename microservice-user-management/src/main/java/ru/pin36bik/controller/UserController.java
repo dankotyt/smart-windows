@@ -1,23 +1,19 @@
 package ru.pin36bik.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import ru.pin36bik.dto.UserDTO;
-import ru.pin36bik.dto.UserLoginDTO;
-import ru.pin36bik.dto.UserRegistrationDTO;
+import ru.pin36bik.dto.LoginRequest;
+import ru.pin36bik.dto.RegistrationRequest;
 import ru.pin36bik.entity.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import ru.pin36bik.security.jwt.JwtTokenParser;
 import ru.pin36bik.service.UserService;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/user")
@@ -27,13 +23,13 @@ public class UserController {
     private final AuthController authController;
 
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> registerUser(@RequestBody UserRegistrationDTO registrationDTO) {
+    public ResponseEntity<UserDTO> registerUser(@RequestBody RegistrationRequest registrationDTO) {
         return new ResponseEntity<>(userService.registerUser(registrationDTO), HttpStatus.OK);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserDTO> loginUser(@RequestBody UserLoginDTO userLoginDTO) {
-        UserDTO userDTO = userService.authorizeUser(userLoginDTO);
+    public ResponseEntity<UserDTO> loginUser(@RequestBody LoginRequest loginRequest) {
+        UserDTO userDTO = userService.authorizeUser(loginRequest);
         return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
 

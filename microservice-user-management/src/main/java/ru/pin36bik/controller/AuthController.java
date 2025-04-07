@@ -7,8 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.pin36bik.config.JwtConfig;
 import ru.pin36bik.dto.UserDTO;
-import ru.pin36bik.dto.UserLoginDTO;
-import ru.pin36bik.dto.AuthResponseDTO;
+import ru.pin36bik.dto.LoginRequest;
+import ru.pin36bik.dto.AuthResponse;
 import ru.pin36bik.entity.User;
 import ru.pin36bik.exceptions.InvalidTokenException;
 import ru.pin36bik.security.jwt.JwtTokenFactory;
@@ -19,7 +19,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
     private final UserService userService;
@@ -27,12 +27,39 @@ public class AuthController {
     private final JwtTokenFactory jwtTokenFactory;
     private final AuthService authService;
 
+//    @PostMapping("/register")
+//    public ResponseEntity<AuthResponse> register(
+//            @RequestBody RegisterRequest request
+//    ) {
+//        AuthResponseDTO authUserDTO = authService.authenticate(loginDTO);
+//        User user = userService.getUserByEmail(loginDTO.getEmail());
+//
+//        String accessToken = jwtTokenFactory.createAccessToken(user);
+//        String refreshToken = jwtTokenFactory.createRefreshToken(user);
+//
+//        LocalDateTime refreshExpiry = LocalDateTime.now().plusSeconds(jwtConfig.getRefreshTtl() / 100);
+//        authService.updateRefreshToken(user.getEmail(), refreshToken, refreshExpiry);
+//
+//        response.addCookie(createRefreshTokenCookie(refreshToken));
+//
+//        UserDTO userDTO = authUserDTO.getUserDTO();
+//
+//        return ResponseEntity.ok(new AuthResponse(accessToken, userDTO));
+//    }
+//
+//    @PostMapping("/authenticate")
+//    public ResponseEntity<AuthResponse> authenticate(
+//            @RequestBody AuthenticationRequest request
+//    ) {
+//
+//    }
+
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDTO> login(
-            @RequestBody UserLoginDTO loginDTO,
+    public ResponseEntity<AuthResponse> login(
+            @RequestBody LoginRequest loginDTO,
             HttpServletResponse response
     ) {
-        AuthResponseDTO authUserDTO = authService.authenticate(loginDTO);
+        AuthResponse authUserDTO = authService.authenticate(loginDTO);
         User user = userService.getUserByEmail(loginDTO.getEmail());
 
         String accessToken = jwtTokenFactory.createAccessToken(user);
@@ -45,11 +72,11 @@ public class AuthController {
 
         UserDTO userDTO = authUserDTO.getUserDTO();
 
-        return ResponseEntity.ok(new AuthResponseDTO(accessToken, userDTO));
+        return ResponseEntity.ok(new AuthResponse(accessToken, userDTO));
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponseDTO> refresh(
+    public ResponseEntity<AuthResponse> refresh(
             @CookieValue("__Host-refresh") String refreshToken,
             HttpServletResponse response
     ) {
@@ -58,7 +85,7 @@ public class AuthController {
             throw new InvalidTokenException("Refresh token отсутствует!");
         }
         try {
-            AuthResponseDTO authResponse = authService.refreshToken(refreshToken);
+            AuthResponse authResponse = authService.refreshToken(refreshToken);
 
             response.addCookie(createSecureCookie(
                     "__Host-refresh",

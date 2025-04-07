@@ -12,7 +12,6 @@ import java.time.LocalDate;
  * и клиентом. Тут находятся те данные, которые пользователь
  * сможет увидеть.
  * */
-@Component
 @Getter
 @Setter
 public class UserDTO {
