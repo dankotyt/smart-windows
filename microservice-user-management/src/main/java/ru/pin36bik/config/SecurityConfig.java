@@ -57,7 +57,7 @@ public class SecurityConfig {
                         // Для production убрать public доступ к user endpoints
                         .requestMatchers("/api/v1/auth/register").permitAll()
                         .requestMatchers("/api/v1/auth/login").permitAll()
-                        .requestMatchers("/api/v1/auth/refresh").permitAll()
+                        .requestMatchers("/api/v1/auth/refresh").authenticated()
                         .requestMatchers("/api/v1/auth/logout").authenticated()
                         .requestMatchers("/user/get_users").permitAll()          // Удалить в production
                         .requestMatchers("/user/get_by_id/{id}").permitAll()     // Удалить в production
