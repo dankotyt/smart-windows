@@ -1,97 +1,72 @@
 package ru.pin36bik.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.pin36bik.config.JwtConfig;
-import ru.pin36bik.dto.AuthResponse;
+import ru.pin36bik.dto.LoginResponse;
 import ru.pin36bik.dto.LoginRequest;
+import ru.pin36bik.dto.RegisterRequest;
 import ru.pin36bik.entity.User;
+import ru.pin36bik.entity.role.Role;
 import ru.pin36bik.exceptions.InvalidTokenException;
 import ru.pin36bik.exceptions.UserNotFoundException;
 import ru.pin36bik.repository.UserRepository;
-import ru.pin36bik.security.jwt.JwtTokenFactory;
 import ru.pin36bik.security.jwt.JwtTokenParser;
-import ru.pin36bik.utils.UserMapper;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
-    private final JwtConfig jwtConfig;
-    private final JwtTokenFactory jwtTokenFactory;
-    private final AuthenticationManager authManager;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
     private final JwtTokenParser jwtTokenParser;
-    private final UserMapper userMapper;
 
-//    public boolean isRefreshTokenValid(String email, String refreshToken) {
-//        User user = getUserByEmail(email);
-//        return refreshToken.equals(user.getRefreshToken()) &&
-//                LocalDateTime.now().isBefore(user.getRefreshTokenExpiry());
-//    }
-
-    public AuthResponse authenticate(LoginRequest loginDTO) {
-        authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginDTO.getEmail(),
-                        loginDTO.getPassword()
-                )
-        );
-
-        User user = userRepository.findByEmail(loginDTO.getEmail())
-                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден!"));
-
-        return createNewTokenPair(user);
+    public LoginResponse register(RegisterRequest registerRequest) {
+        var user = User.builder()
+                .name(registerRequest.getName())
+                .surname(registerRequest.getSurname())
+                .birthday(registerRequest.getBirthday())
+                .email(registerRequest.getEmail())
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .role(Role.USER)
+                .build();
+        userRepository.save(user);
+        return jwtService.generateTokenPair(user);
     }
 
-    public AuthResponse refreshToken(String refreshToken) {
+    public LoginResponse login(LoginRequest request) {
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new BadCredentialsException("Неверный пароль");
+        }
+
+        return jwtService.generateTokenPair(user);
+    }
+
+    public LoginResponse refreshToken(String refreshToken) {
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            throw new InvalidTokenException("Refresh токен пустой!");
+        }
         String email = jwtTokenParser.extractUsername(refreshToken);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден!"));
-
-        if (!jwtTokenParser.isTokenValid(refreshToken, user)) {
-            throw new InvalidTokenException("Некорректный refresh token");
-        }
-
-        if (!refreshToken.equals(user.getRefreshToken()) ||
-                LocalDateTime.now().isAfter(user.getRefreshTokenExpiry())) {
-            throw new InvalidTokenException("Срок действия токена истек");
-        }
-
-        return createNewTokenPair(user);
-    }
-
-    public void updateRefreshToken(String email, String refreshToken, LocalDateTime expiry) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден!"));
-
-        user.setRefreshToken(refreshToken);
-        user.setRefreshTokenExpiry(expiry);
+                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+        user.setRefreshToken(null);
         userRepository.save(user);
+
+        return jwtService.generateTokenPair(user);
     }
 
     public void logout(String refreshToken) {
         userRepository.findByRefreshToken(refreshToken)
                 .ifPresent(user -> {
                     user.setRefreshToken(null);
+                    user.setRefreshTokenExpiry(null);
                     userRepository.save(user);
                 });
-    }
-
-    private AuthResponse createNewTokenPair(User user) {
-        String newAccessToken = jwtTokenFactory.createAccessToken(user);
-        String newRefreshToken = jwtTokenFactory.createRefreshToken(user);
-
-        LocalDateTime refreshExpiry = LocalDateTime.now().plusSeconds(jwtConfig.getRefreshTtl() / 100);
-        updateRefreshToken(user.getEmail(), newRefreshToken, refreshExpiry);
-
-        return new AuthResponse(
-                newAccessToken, // Access token тоже нужен!
-                userMapper.toDTO(user)
-        );
     }
 }

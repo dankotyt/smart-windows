@@ -3,7 +3,6 @@ package ru.pin36bik.dto;
 import jakarta.validation.constraints.Email;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
@@ -16,7 +15,7 @@ import java.time.LocalDate;
 @Setter
 public class UserDTO {
     private String name;
-    private String lastName;
+    private String surname;
     private LocalDate birthday;
 
     @Email(message = "Некорректный email!")

@@ -21,7 +21,7 @@ public class ArchivedUser {
     @Column(nullable = false)
     private String name;
 
-    private String lastName;
+    private String surname;
 
     @Column(nullable = false)
     private LocalDate birthday;

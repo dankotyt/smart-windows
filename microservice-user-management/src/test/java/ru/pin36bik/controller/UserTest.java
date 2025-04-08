@@ -15,7 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import ru.pin36bik.MicroserviceUsersApplication;
 import ru.pin36bik.dto.UserDTO;
 import ru.pin36bik.dto.LoginRequest;
-import ru.pin36bik.dto.RegistrationRequest;
+import ru.pin36bik.dto.RegisterRequest;
 import ru.pin36bik.entity.ArchivedUser;
 import ru.pin36bik.entity.User;
 import ru.pin36bik.repository.ArchivedUserRepository;
@@ -70,11 +70,10 @@ class UserTest {
 
         User user = new User();
         user.setName("Test");
-        user.setLastName("User");
+        user.setSurname("User");
         user.setBirthday(LocalDate.of(1990, 1, 1));
         user.setEmail("test@gmail.com");
         user.setPassword(passwordEncoder.encode("password"));
-        user.setCreatedAt(LocalDateTime.now());
 
         userRepository.save(user);
 
@@ -92,14 +91,14 @@ class UserTest {
     @Test
     void testRegisterUser() throws Exception {
 
-        RegistrationRequest registrationDTO = new RegistrationRequest();
+        RegisterRequest registrationDTO = new RegisterRequest();
         registrationDTO.setName("John");
-        registrationDTO.setLastName("Smith");
+        registrationDTO.setSurname("Smith");
         registrationDTO.setBirthday(LocalDate.of(1990, 1, 1));
         registrationDTO.setEmail("john.smith@gmail.com");
         registrationDTO.setPassword("password");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/user/register")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/register")
                         .with(csrf().asHeader()) // Добавляем CSRF-токен в заголовок
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registrationDTO)))
@@ -117,22 +116,21 @@ class UserTest {
         // Создаем пользователя с email "john.smith@gmail.com"
         User existingUser = new User();
         existingUser.setName("Existing");
-        existingUser.setLastName("User");
+        existingUser.setSurname("User");
         existingUser.setBirthday(LocalDate.of(1990, 1, 1));
         existingUser.setEmail("john.smith@gmail.com");
         existingUser.setPassword(passwordEncoder.encode("password"));
-        existingUser.setCreatedAt(LocalDateTime.now());
         userRepository.save(existingUser);
 
         // Пытаемся зарегистрировать нового пользователя с тем же email
-        RegistrationRequest registrationDTO = new RegistrationRequest();
+        RegisterRequest registrationDTO = new RegisterRequest();
         registrationDTO.setName("John");
-        registrationDTO.setLastName("Smith");
+        registrationDTO.setSurname("Smith");
         registrationDTO.setBirthday(LocalDate.of(1990, 1, 1));
         registrationDTO.setEmail("john.smith@gmail.com");
         registrationDTO.setPassword("password");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/user/register")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/register")
                         .with(csrf().asHeader()) // Добавляем CSRF-токен в заголовок
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registrationDTO)))
@@ -147,7 +145,7 @@ class UserTest {
         loginDTO.setEmail("test@gmail.com");
         loginDTO.setPassword("password");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/user/login")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/login")
                         .with(csrf()) // Добавляем CSRF-токен
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(loginDTO)))
@@ -164,7 +162,7 @@ class UserTest {
         loginDTO.setEmail("test@gmail.com");
         loginDTO.setPassword("password");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/user/login")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(loginDTO)))
                 .andExpect(MockMvcResultMatchers.status().isForbidden()); // Ожидаем 403
@@ -216,7 +214,7 @@ class UserTest {
 
         UserDTO userDTO = new UserDTO();
         userDTO.setName("Max");
-        userDTO.setLastName("Smith");
+        userDTO.setSurname("Smith");
 
         mockMvc.perform(MockMvcRequestBuilders.put("/user/update")
                         .with(csrf()) // Добавляем CSRF-токен
@@ -246,7 +244,7 @@ class UserTest {
     void testDeleteAndArchiveUser() {
         User user = new User();
         user.setName("John");
-        user.setLastName("Doe");
+        user.setSurname("Doe");
         user.setBirthday(LocalDate.of(1990, 1, 1));
         user.setEmail("john.doe@example.com");
         user.setPassword("password");

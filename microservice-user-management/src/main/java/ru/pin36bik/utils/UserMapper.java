@@ -9,7 +9,7 @@ public class UserMapper {
     public UserDTO toDTO(User user) {
         UserDTO dto = new UserDTO();
         dto.setName(user.getName());
-        dto.setLastName(user.getLastName());
+        dto.setSurname(user.getSurname());
         dto.setEmail(user.getEmail());
         return dto;
     }

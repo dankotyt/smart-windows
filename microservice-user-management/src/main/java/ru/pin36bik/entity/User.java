@@ -19,24 +19,18 @@ import ru.pin36bik.entity.role.Role;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-@Table(name = "users", schema = "app_schema")
+@Table(name = "users")
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_seq")
-    @SequenceGenerator(
-            name = "users_seq",
-            sequenceName = "app_schema.users_seq",
-            allocationSize = 50
-    )
-    //@UuidGenerator(style = UuidGenerator.Style.RANDOM)
     @Column(updatable = false, unique = true, name = "id")
     private Long userId;
 
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private String lastName;
+    @Column(nullable = false, name = "surname")
+    private String surname;
 
     @Column(nullable = false)
     private LocalDate birthday;
@@ -106,7 +100,7 @@ public class User implements UserDetails {
         return "User{" +
                 "userId=" + userId +
                 ", name='" + name + '\'' +
-                ", lastName='" + lastName + '\'' +
+                ", lastName='" + surname + '\'' +
                 ", birthday=" + birthday +
                 ", email='" + email + '\'' +
                 ", createdAt=" + createdAt +

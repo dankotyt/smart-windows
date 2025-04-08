@@ -20,7 +20,6 @@ import ru.pin36bik.security.jwt.JwtTokenFactory;
 import ru.pin36bik.security.jwt.JwtTokenParser;
 
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 @Configuration
@@ -35,9 +34,8 @@ public class JwtConfig {
     private UserRepository userRepository;
 
     @Bean
-    public JwtTokenFactory jwtTokenFactory() {
-        SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-        return new JwtTokenFactory(key, accessTtl, refreshTtl);
+    public JwtTokenFactory jwtTokenFactory(SecretKey secretKey) {
+        return new JwtTokenFactory(secretKey, accessTtl, refreshTtl);
     }
 
     @Bean
