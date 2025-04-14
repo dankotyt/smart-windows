@@ -1,7 +1,9 @@
 package ru.pin36bik.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
+import ru.pin36bik.dto.UserDTOForAdmin;
 import ru.pin36bik.entity.ArchivedUser;
 import ru.pin36bik.exceptions.EmailBusyException;
 import ru.pin36bik.exceptions.UserNotFoundException;
@@ -13,20 +15,29 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.pin36bik.repository.ArchivedUserRepository;
 import ru.pin36bik.repository.UserRepository;
+import ru.pin36bik.utils.UserMapper;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final ArchivedUserRepository archivedUserRepository;
+    private final UserMapper userMapper;
     //private final EmailService emailService // для восстановления пароля
 
-    //понадобиться для микросервиса аналитики
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    @Transactional(readOnly = true)
+    public List<UserDTOForAdmin> getAllUsersDTOs() {
+        List<User> users = userRepository.findAll();
+        List<UserDTOForAdmin> userDTOs = users.stream()
+                .map(userMapper :: toDTOForAdmin)
+                .collect(Collectors.toList());
+        log.info("Содержимое users: {}", userDTOs);
+        return userDTOs;
     }
 
     public User getUserByEmail(String email) {
@@ -60,7 +71,7 @@ public class UserService implements UserDetailsService {
         }
 
         userRepository.save(user);
-        return convertToDTO(user);
+        return userMapper.toDTO(user);
     }
 
     @Transactional
@@ -76,14 +87,6 @@ public class UserService implements UserDetailsService {
         au.setCreatedAt(user.getCreatedAt());
         archivedUserRepository.save(au);
         userRepository.delete(user);
-    }
-
-    private UserDTO convertToDTO(User user) {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setName(user.getName());
-        userDTO.setSurname(user.getSurname());
-        userDTO.setEmail(user.getEmail());
-        return userDTO;
     }
 
     @Override

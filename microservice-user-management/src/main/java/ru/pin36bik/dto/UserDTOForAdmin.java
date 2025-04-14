@@ -1,24 +1,25 @@
 package ru.pin36bik.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import ru.pin36bik.entity.role.Role;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-/**
- * UserDTO - сущность, которая передает данные между контроллером
- * и клиентом. Тут находятся те данные, которые пользователь
- * сможет увидеть.
- * */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDTO {
+public class UserDTOForAdmin {
     @JsonProperty("id")
     private Long id;
 
@@ -31,7 +32,12 @@ public class UserDTO {
     @JsonProperty("birthday")
     private LocalDate birthday;
 
-    @Email(message = "Некорректный email!")
     @JsonProperty("email")
     private String email;
+
+    @JsonProperty("createdAt")
+    private LocalDateTime createdAt;
+
+    @JsonProperty("role")
+    private Role role;
 }

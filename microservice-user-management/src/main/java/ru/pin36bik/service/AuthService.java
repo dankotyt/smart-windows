@@ -30,7 +30,7 @@ public class AuthService {
                 .birthday(registerRequest.getBirthday())
                 .email(registerRequest.getEmail())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .role(Role.USER)
+                .role(Role.ADMIN) //prod -> только .role(Role.USER)
                 .build();
         userRepository.save(user);
         return jwtService.generateTokenPair(user);

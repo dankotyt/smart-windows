@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -22,6 +23,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -59,9 +61,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/login").permitAll()
                         .requestMatchers("/api/v1/auth/refresh").authenticated()
                         .requestMatchers("/api/v1/auth/logout").authenticated()
-                        .requestMatchers("/user/get_users").permitAll()          // Удалить в production
-                        .requestMatchers("/user/get_by_id/{id}").permitAll()     // Удалить в production
-                        .requestMatchers("/user/get_by_email/{email}").permitAll() // Удалить в production
+                        .requestMatchers("/user/get_users").hasRole("ADMIN")         // Удалить в production
+                        .requestMatchers("/user/**").authenticated()    // Удалить в production
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider);
