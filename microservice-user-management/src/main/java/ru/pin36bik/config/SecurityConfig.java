@@ -3,22 +3,20 @@ package ru.pin36bik.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import ru.pin36bik.security.filter.JwtAuthFilter;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -35,16 +33,9 @@ public class SecurityConfig {
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         http
-                // CORS всегда включен (и для dev, и для production)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                // CSRF настройка (для dev оставляем текущую, для production раскомментировать нижнюю)
-
-                .csrf(csrf -> csrf
-                        .requireCsrfProtectionMatcher(new CsrfRequestMatcher())
-                )
-
-                //.csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
 
                 /* Для production вместо верхнего блока:
                 .csrf(csrf -> csrf
@@ -61,32 +52,17 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/login").permitAll()
                         .requestMatchers("/api/v1/auth/refresh").authenticated()
                         .requestMatchers("/api/v1/auth/logout").authenticated()
-                        .requestMatchers("/user/get_users").hasRole("ADMIN")         // Удалить в production
                         .requestMatchers("/user/**").authenticated()    // Удалить в production
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.sendError(HttpStatus.UNAUTHORIZED.value(), "Требуется аутентификация");
+                        })
                 )
                 .authenticationProvider(authenticationProvider);
 
         return http.build();
-    }
-
-    // Для production можно удалить этот класс полностью
-    private static class CsrfRequestMatcher implements RequestMatcher {
-        private final List<AntPathRequestMatcher> excludedMatchers = Arrays.asList(
-                new AntPathRequestMatcher("/api/v1/auth/register", "POST"),
-                new AntPathRequestMatcher("/api/v1/auth/login", "POST"),
-                new AntPathRequestMatcher("/api/v1/auth/refresh", "POST"),
-                new AntPathRequestMatcher("/api/v1/auth/logout", "POST"),
-                new AntPathRequestMatcher("/user/get_users", "GET"),          // Удалить в production
-                new AntPathRequestMatcher("/user/get_by_email/{email}", "GET"), // Удалить в production
-                new AntPathRequestMatcher("/user/get_by_id/{id}", "GET")      // Удалить в production
-        );
-
-        @Override
-        public boolean matches(HttpServletRequest request) {
-            return excludedMatchers.stream()
-                    .noneMatch(matcher -> matcher.matches(request));
-        }
     }
 
     @Bean

@@ -10,9 +10,12 @@ import ru.pin36bik.dto.RegisterRequest;
 import ru.pin36bik.entity.User;
 import ru.pin36bik.entity.role.Role;
 import ru.pin36bik.exceptions.InvalidTokenException;
+import ru.pin36bik.exceptions.UserAlreadyExistsException;
 import ru.pin36bik.exceptions.UserNotFoundException;
 import ru.pin36bik.repository.UserRepository;
 import ru.pin36bik.security.jwt.JwtTokenParser;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -24,13 +27,16 @@ public class AuthService {
     private final JwtTokenParser jwtTokenParser;
 
     public LoginResponse register(RegisterRequest registerRequest) {
+        if (userRepository.existsByEmail(registerRequest.getEmail())) {
+            throw new UserAlreadyExistsException("Пользователь с email " + registerRequest.getEmail() + " уже существует");
+        }
         var user = User.builder()
                 .name(registerRequest.getName())
                 .surname(registerRequest.getSurname())
                 .birthday(registerRequest.getBirthday())
                 .email(registerRequest.getEmail())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .role(Role.ADMIN) //prod -> только .role(Role.USER)
+                .role(Role.USER) //prod -> только .role(Role.USER)
                 .build();
         userRepository.save(user);
         return jwtService.generateTokenPair(user);
@@ -49,15 +55,26 @@ public class AuthService {
     }
 
     public LoginResponse refreshToken(String refreshToken) {
-        if (refreshToken == null || refreshToken.isEmpty()) {
-            throw new InvalidTokenException("Refresh токен пустой!");
-        }
+
         String email = jwtTokenParser.extractUsername(refreshToken);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
-        user.setRefreshToken(null);
-        userRepository.save(user);
 
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            throw new InvalidTokenException("Refresh токен пустой!");
+        }
+
+        if (!refreshToken.equals(user.getRefreshToken())) {
+            throw new InvalidTokenException("Несоответствие refresh токена");
+        }
+
+        if (!jwtTokenParser.isTokenValid(refreshToken, user)) {
+            if (user.getRefreshTokenExpiry() != null &&
+                    user.getRefreshTokenExpiry().isBefore(LocalDateTime.now())) {
+                throw new InvalidTokenException("Срок действия refresh токена истек");
+            }
+            throw new InvalidTokenException("Refresh токен недействителен или истек");
+        }
         return jwtService.generateTokenPair(user);
     }
 

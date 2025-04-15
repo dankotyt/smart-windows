@@ -60,11 +60,12 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(
-            @CookieValue("__Host-refresh") String refreshToken,
-            HttpServletResponse response
-    ) {
-        authService.logout(refreshToken);
+            @CookieValue(value = "__Host-refresh", required = false) String refreshToken,
+            HttpServletResponse response) {
+        if (refreshToken != null) {
+            authService.logout(refreshToken);
+        }
         cookieService.expireAllCookies(response);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().build(); //ResponseEntity.noContent().build();
     }
 }

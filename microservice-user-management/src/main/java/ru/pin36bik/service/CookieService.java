@@ -27,7 +27,7 @@ public class CookieService {
         ResponseCookie cookie = ResponseCookie.from("__Host-refresh", refreshToken)
                 .httpOnly(true)
                 .secure(true)
-                .path("/api/v1/auth/refresh")
+                .path("/")
                 .maxAge((int) jwtConfig.getRefreshTtl() / 1000)
                 .sameSite("Strict")
                 .build();
@@ -36,7 +36,7 @@ public class CookieService {
 
     public void expireAllCookies(HttpServletResponse response) {
         expireCookie(response, "__Host-auth-token", "/");
-        expireCookie(response, "__Host-refresh", "/api/v1/auth/refresh");
+        expireCookie(response, "__Host-refresh", "/");
     }
 
     private void expireCookie(HttpServletResponse response, String name, String path) {

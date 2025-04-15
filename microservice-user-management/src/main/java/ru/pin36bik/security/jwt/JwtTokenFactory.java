@@ -7,6 +7,7 @@ import ru.pin36bik.entity.User;
 import javax.crypto.SecretKey;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 
 @RequiredArgsConstructor
 public class JwtTokenFactory {
@@ -15,13 +16,12 @@ public class JwtTokenFactory {
     private final long accessTtl;
     private final long refreshTtl;
 
-    public String createAccessToken(User user) {
-
+    public String createAccessToken(User user, List<String> authorities) {
         return Jwts.builder()
-                .claim("userId", user.getUserId())
                 .subject(user.getEmail())
-                .issuedAt(Date.from(Instant.now()))
+                .issuedAt(new Date())
                 .expiration(Date.from(Instant.now().plusMillis(accessTtl)))
+                .claim("authorities", authorities)
                 .signWith(secretKey)
                 .compact();
     }

@@ -1,7 +1,6 @@
 package ru.pin36bik.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import ru.pin36bik.dto.UserDTOForAdmin;
 import ru.pin36bik.entity.ArchivedUser;
@@ -17,12 +16,12 @@ import ru.pin36bik.repository.ArchivedUserRepository;
 import ru.pin36bik.repository.UserRepository;
 import ru.pin36bik.utils.UserMapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
@@ -36,7 +35,6 @@ public class UserService implements UserDetailsService {
         List<UserDTOForAdmin> userDTOs = users.stream()
                 .map(userMapper :: toDTOForAdmin)
                 .collect(Collectors.toList());
-        log.info("Содержимое users: {}", userDTOs);
         return userDTOs;
     }
 
@@ -54,6 +52,10 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден!"));
 
+        //====протестим, насколько это эффективно и безопасно=====
+        String currentRefreshToken = user.getRefreshToken();
+        LocalDateTime currentRefreshTokenExpiry = user.getRefreshTokenExpiry();
+
         if (userDTO.getName() != null) {
             user.setName(userDTO.getName());
         }
@@ -69,6 +71,9 @@ public class UserService implements UserDetailsService {
             }
             user.setEmail(userDTO.getEmail());
         }
+        //====протестим, насколько это эффективно и безопасно=====
+        user.setRefreshToken(currentRefreshToken);
+        user.setRefreshTokenExpiry(currentRefreshTokenExpiry);
 
         userRepository.save(user);
         return userMapper.toDTO(user);

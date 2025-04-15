@@ -5,9 +5,6 @@ import ru.pin36bik.dto.UserDTO;
 import ru.pin36bik.dto.UserDTOForAdmin;
 import ru.pin36bik.entity.User;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Component
 public class UserMapper {
 
