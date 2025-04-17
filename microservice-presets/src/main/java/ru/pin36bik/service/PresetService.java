@@ -1,5 +1,6 @@
 package ru.pin36bik.service;
 
+import org.springframework.cache.annotation.CachePut;
 import ru.pin36bik.dto.PresetDTO;
 import ru.pin36bik.entity.Preset;
 import ru.pin36bik.repository.PresetRepository;
@@ -31,7 +32,7 @@ public class PresetService {
         return modelMapper.map(preset, PresetDTO.class);
     }
 
-    @CacheEvict(value = "presets", key = "#presetDTO.id")
+    @CachePut(value = "presets", key = "#presetDTO.id")
     public PresetDTO createPreset(PresetDTO presetDTO) {
         Preset preset = modelMapper.map(presetDTO, Preset.class);
         Preset savedPreset = presetRepos.save(preset);
@@ -39,7 +40,7 @@ public class PresetService {
         return modelMapper.map(savedPreset, PresetDTO.class);
     }
 
-    @CacheEvict(value = "presets", key = "#presetDTO.id")
+    @CachePut(value = "presets", key = "#presetDTO.id")
     public PresetDTO updatePreset(PresetDTO presetDTO) {
         Preset preset = presetRepos.findById(presetDTO.getId())
                 .orElseThrow(() -> new RuntimeException("Preset not found with id: " + presetDTO.getId()));

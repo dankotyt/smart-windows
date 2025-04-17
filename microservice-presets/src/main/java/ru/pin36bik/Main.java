@@ -3,11 +3,13 @@ package ru.pin36bik;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ApplicationContext;
 import ru.pin36bik.entity.Preset;
 import ru.pin36bik.repository.PresetRepository;
 
 @SpringBootApplication
+@EnableCaching
 public class Main {
     public static void main(String[] args) {
         // Загружаем переменные из .env файла
