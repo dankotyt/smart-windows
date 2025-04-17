@@ -9,9 +9,10 @@ import org.springframework.cache.annotation.EnableCaching;
 @EnableCaching
 public class PresetsApplication {
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         Dotenv dotenv = Dotenv.configure().load();
-        dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
+        dotenv.entries().forEach(entry ->
+                System.setProperty(entry.getKey(), entry.getValue()));
 
         SpringApplication.run(PresetsApplication.class, args);
     }

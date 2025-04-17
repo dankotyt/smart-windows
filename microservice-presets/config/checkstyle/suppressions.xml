@@ -1,5 +1,0 @@
-<?xml version="1.0"?>
-<suppressions>
-    <suppress checks=".*" files=".*[/\\]generated[/\\].*"/>
-    <suppress checks=".*" files=".*[/\\]target[/\\].*"/>
-</suppressions>

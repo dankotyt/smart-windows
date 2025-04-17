@@ -1,5 +1,6 @@
 package ru.pin36bik.config;
 
+import java.time.Duration;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,8 +14,6 @@ import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import java.time.Duration;
-
 @Configuration
 @EnableCaching
 public class RedisConfig {
@@ -24,11 +23,14 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisCacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
-        RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
+    public RedisCacheManager cacheManager(
+            final RedisConnectionFactory redisConnectionFactory) {
+        RedisCacheConfiguration config =
+                RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(10))
                 .serializeValuesWith(
-                        RedisSerializationContext.SerializationPair.fromSerializer(
+                        RedisSerializationContext
+                        .SerializationPair.fromSerializer(
                                 new GenericJackson2JsonRedisSerializer()
                         )
                 );
@@ -39,13 +41,18 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
-        final RedisTemplate<String, Object> template = new RedisTemplate<String, Object>();
+    public RedisTemplate<String, Object> redisTemplate(
+            final RedisConnectionFactory connectionFactory) {
+        final RedisTemplate<String, Object> template =
+                new RedisTemplate<String, Object>();
         template.setConnectionFactory(jedisConnectionFactory());
         template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new GenericToStringSerializer<Object>(Object.class));
-        template.setHashKeySerializer(new StringRedisSerializer());
-        template.setHashValueSerializer(new GenericToStringSerializer<Object>(Object.class));
+        template.setValueSerializer(
+                new GenericToStringSerializer<Object>(Object.class));
+        template.setHashKeySerializer(
+                new StringRedisSerializer());
+        template.setHashValueSerializer(
+                new GenericToStringSerializer<Object>(Object.class));
         return template;
     }
 }

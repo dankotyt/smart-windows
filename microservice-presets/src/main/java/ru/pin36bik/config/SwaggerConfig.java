@@ -14,6 +14,7 @@ public class SwaggerConfig {
                 .info(new Info()
                         .title("API микросервиса пресетов")
                         .version("0.0")
-                        .description("API для управления пресетами настроек окон в приложении Smart Windows"));
+                        .description("API для управления пресетами настроек "
+                                + "окон в приложении Smart Windows"));
     }
 }
