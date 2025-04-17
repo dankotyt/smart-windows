@@ -14,6 +14,8 @@ public class SwaggerConfig {
                 .info(new Info()
                         .title("API микросервиса аналитики")
                         .version("0.0")
-                        .description("API для управления сбором аналитики в приложении Smart Windows"));
+                        .description("API для управления сбором и "
+                                + "анализом данных об использовании окон "
+                                + "в приложении Smart Windows"));
     }
 }
