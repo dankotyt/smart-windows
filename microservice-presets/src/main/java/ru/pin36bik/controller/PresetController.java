@@ -1,8 +1,9 @@
 package ru.pin36bik.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import ru.pin36bik.dto.PresetDTO;
 import ru.pin36bik.service.PresetService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
@@ -13,7 +14,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/presets")
+@RequestMapping(value = "/presets",
+        produces = MediaType.APPLICATION_JSON_VALUE,
+        consumes = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Preset Controller", description = "API для управления пресетами настроек окна")
 public class PresetController {
 
@@ -24,51 +27,53 @@ public class PresetController {
         this.presetService = presetService;
     }
 
-    @Operation(summary = "Найти пресет по его ID", description = "Возвращает единственный пресет по ID")
+    @Operation(summary = "Найти пресет по ID", description = "Возвращает пресет по указанному ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Пресет успешно получен"),
             @ApiResponse(responseCode = "404", description = "Пресет не найден")
     })
-    @GetMapping("/get/{id}")
+    @GetMapping("/{id}")
     public PresetDTO getPreset(
-            @Parameter(description = "ID нужного пресета", required = true)
+            @Parameter(description = "ID пресета", required = true, example = "1")
             @PathVariable Long id) {
         return presetService.getPresetById(id);
     }
 
-    @Operation(summary = "Создать новый пресет", description = "Возвращает вновь созданный пресет")
+    @Operation(summary = "Создать новый пресет", description = "Создает и возвращает новый пресет")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Пресет успешно создан"),
-            @ApiResponse(responseCode = "400", description = "Некорректно введены данные")
+            @ApiResponse(responseCode = "400", description = "Некорректные данные")
     })
-    @PostMapping("/post")
+    @PostMapping
     public PresetDTO createPreset(
-            @Parameter(description = "DTO пресета, который будет создан", required = true)
+            @Parameter(description = "Данные пресета в формате JSON", required = true)
             @Valid @RequestBody PresetDTO presetDTO) {
         return presetService.createPreset(presetDTO);
     }
 
-    @Operation(summary = "Обновить существующий пресет", description = "Обновляет существующий пресет и возвращает его")
+    @Operation(summary = "Обновить пресет", description = "Обновляет и возвращает существующий пресет")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Пресет успешно обновлён"),
-            @ApiResponse(responseCode = "400", description = "Некорректно введены данные"),
+            @ApiResponse(responseCode = "200", description = "Пресет успешно обновлен"),
+            @ApiResponse(responseCode = "400", description = "Некорректные данные"),
             @ApiResponse(responseCode = "404", description = "Пресет не найден")
     })
-    @PutMapping("/update")
+    @PutMapping("/{id}")
     public PresetDTO updatePreset(
-            @Parameter(description = "DTO пресета, который будет обновлён", required = true)
+            @Parameter(description = "ID пресета", required = true, example = "1")
+            @PathVariable Long id,
+            @Parameter(description = "Обновленные данные пресета", required = true)
             @Valid @RequestBody PresetDTO presetDTO) {
         return presetService.updatePreset(presetDTO);
     }
 
-    @Operation(summary = "Удалить пресет по его ID", description = "Удаляет пресет с заданным ID")
+    @Operation(summary = "Удалить пресет", description = "Удаляет пресет по указанному ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Пресет успешно удалён"),
+            @ApiResponse(responseCode = "204", description = "Пресет успешно удален"),
             @ApiResponse(responseCode = "404", description = "Пресет не найден")
     })
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public void deletePreset(
-            @Parameter(description = "ID пресета, который будет удалён", required = true)
+            @Parameter(description = "ID пресета", required = true, example = "1")
             @PathVariable Long id) {
         presetService.deletePreset(id);
     }
