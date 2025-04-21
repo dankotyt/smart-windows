@@ -24,13 +24,18 @@ repositories {
 }
 
 dependencies {
+	implementation(project(":microservice-presets"))
+	implementation(project(":microservice-user-management"))
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-validation")
+	implementation("org.modelmapper:modelmapper:2.4.4")
 	implementation ("io.github.cdimascio:dotenv-java:3.0.0")
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	implementation("org.springframework.kafka:spring-kafka")
 }
 
 tasks.withType<Test> {

@@ -34,6 +34,8 @@ dependencies {
     //implementation ("org.flywaydb:flyway-core")
     implementation ("io.github.cdimascio:dotenv-java:3.0.0")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    implementation("org.springframework.kafka:spring-kafka")
+    implementation(project(":microservice-presets"))
 
     compileOnly ("org.springframework.boot:spring-boot-starter-security")
     compileOnly("org.projectlombok:lombok")
