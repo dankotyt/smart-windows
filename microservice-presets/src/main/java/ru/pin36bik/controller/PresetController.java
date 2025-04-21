@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,7 +21,7 @@ import ru.pin36bik.dto.PresetDTO;
 import ru.pin36bik.service.PresetService;
 
 @RestController
-@RequestMapping(value = "/presets",
+@RequestMapping(value = "/api/presets/v0",
         produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Preset Controller",
@@ -28,10 +29,14 @@ import ru.pin36bik.service.PresetService;
 public class PresetController {
 
     private final PresetService presetService;
+    private final KafkaTemplate<String, PresetDTO> kafkaTemplate;
 
     @Autowired
-    public PresetController(final PresetService myPresetService) {
+    public PresetController(final PresetService myPresetService,
+                            final KafkaTemplate<String,
+                                    PresetDTO> myKafkaTemplate) {
         this.presetService = myPresetService;
+        this.kafkaTemplate = myKafkaTemplate;
     }
 
     @Operation(summary = "Найти пресет по ID",
@@ -42,8 +47,8 @@ public class PresetController {
             @ApiResponse(responseCode = "404",
                     description = "Пресет не найден")
     })
-    @GetMapping("/{id}")
-    public PresetDTO getPreset(
+    @GetMapping("/get-by-id/{id}")
+    public PresetDTO getPresetById(
             @Parameter(description = "ID пресета",
                     required = true, example = "1")
             @PathVariable final Long id) {
@@ -58,12 +63,12 @@ public class PresetController {
             @ApiResponse(responseCode = "400",
                     description = "Некорректные данные")
     })
-    @PostMapping
+    @PostMapping("/create")
     public PresetDTO createPreset(
             @Parameter(description = "Данные пресета в формате JSON",
                     required = true)
-            @Valid @RequestBody final PresetDTO presetDTO) {
-        return presetService.createPreset(presetDTO);
+            @Valid @RequestBody final PresetDTO preset_DTO) {
+        return presetService.createPreset(preset_DTO);
     }
 
     @Operation(summary = "Обновить пресет",
@@ -76,16 +81,16 @@ public class PresetController {
             @ApiResponse(responseCode = "404",
                     description = "Пресет не найден")
     })
-    @PutMapping("/{id}")
-    public PresetDTO updatePreset(
+    @PutMapping("/update-by-id/{id}")
+    public PresetDTO updatePresetById(
             @Parameter(description = "ID пресета",
                     required = true,
                     example = "1")
             @PathVariable final Long id,
             @Parameter(description = "Обновленные данные пресета",
                     required = true)
-            @Valid @RequestBody final PresetDTO presetDTO) {
-        return presetService.updatePreset(presetDTO);
+            @Valid @RequestBody final PresetDTO preset_DTO) {
+        return presetService.updatePreset(preset_DTO);
     }
 
     @Operation(summary = "Удалить пресет",
@@ -96,8 +101,8 @@ public class PresetController {
             @ApiResponse(responseCode = "404",
                     description = "Пресет не найден")
     })
-    @DeleteMapping("/{id}")
-    public void deletePreset(
+    @DeleteMapping("/delete-by-id/{id}")
+    public void deletePresetById(
             @Parameter(description = "ID пресета",
                     required = true,
                     example = "1")

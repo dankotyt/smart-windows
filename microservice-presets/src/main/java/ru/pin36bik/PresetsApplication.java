@@ -10,7 +10,10 @@ import org.springframework.cache.annotation.EnableCaching;
 public class PresetsApplication {
 
     public static void main(final String[] args) {
-        Dotenv dotenv = Dotenv.configure().load();
+        Dotenv dotenv = Dotenv.configure()
+                .ignoreIfMissing()
+                .load();
+
         dotenv.entries().forEach(entry ->
                 System.setProperty(entry.getKey(), entry.getValue()));
 
