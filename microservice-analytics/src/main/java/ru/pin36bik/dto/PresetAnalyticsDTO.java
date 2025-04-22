@@ -10,39 +10,39 @@ import lombok.Setter;
 @Getter
 @Setter
 @Schema(description = "Данные о пресете настроек окна, "
-        + "загруженном пользователем")
+        + "доступном для загрузки")
 public class PresetAnalyticsDTO {
     @Schema(description = "ID пресета",
-            example = "1")
+            example = "12345")
     @JsonProperty("id")
     private Long id;
 
-    @Schema(description = "ID пользователя, загрузившего пресет",
-            example = "user-456")
-    @JsonProperty("user_id")
-    private String userId;
+    @Schema(description = "Количество загрузок данного пресета",
+            example = "456000")
+    @JsonProperty("downloads_number")
+    private Long downloadsNumber;
 
     @Schema(description = "Название пресета",
             example = "Утренний режим")
     @JsonProperty("preset_name")
     private String presetName;
 
-    @Schema(description = "Время загрузки пресета",
+    @Schema(description = "Время создания пресета",
             example = "2023-12-01T10:15:30")
-    @JsonProperty("downloaded_at")
+    @JsonProperty("created_at")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime downloadedAt;
+    private LocalDateTime createdAt;
 
     public PresetAnalyticsDTO() {
     }
 
     public PresetAnalyticsDTO(final Long myId,
-                              final String myUserId,
+                              final Long myDownloadsNumber,
                               final String myPresetName,
-                              final LocalDateTime myDownloadedAt) {
+                              final LocalDateTime myCreatedAt) {
         this.id = myId;
-        this.userId = myUserId;
+        this.downloadsNumber = myDownloadsNumber;
         this.presetName = myPresetName;
-        this.downloadedAt = myDownloadedAt;
+        this.createdAt = myCreatedAt;
     }
 }

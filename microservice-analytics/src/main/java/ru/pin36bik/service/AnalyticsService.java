@@ -1,58 +1,23 @@
 package ru.pin36bik.service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.pin36bik.dto.PresetAnalyticsDTO;
 import ru.pin36bik.dto.UserAnalyticsDTO;
-import ru.pin36bik.dto.WindowAnalyticsDTO;
 import ru.pin36bik.entity.PresetAnalytics;
 import ru.pin36bik.entity.UserAnalytics;
-import ru.pin36bik.entity.WindowAnalytics;
 import ru.pin36bik.repository.PresetAnalyticsRepository;
 import ru.pin36bik.repository.UserAnalyticsRepository;
-import ru.pin36bik.repository.WindowAnalyticsRepository;
 
 @Service
 @RequiredArgsConstructor
 public class AnalyticsService {
 
-    private final WindowAnalyticsRepository windowRepository;
     private final UserAnalyticsRepository userRepository;
     private final PresetAnalyticsRepository presetRepository;
-
-    @Transactional
-    public WindowAnalyticsDTO saveWindowAnalytics(
-            final WindowAnalyticsDTO dto) {
-        WindowAnalytics entity = new WindowAnalytics();
-        entity.setWindowId(dto.getWindowId());
-        entity.setActive(dto.isActive());
-        entity.setSectionsCount(dto.getSectionsCount());
-        entity.setHeight(dto.getHeight());
-        entity.setSectionSize(dto.getSectionSize());
-        entity.setTimestamp(dto.getTimestamp()
-                != null ? dto.getTimestamp() : LocalDateTime.now());
-
-        WindowAnalytics saved = windowRepository.save(entity);
-        return toWindowDto(saved);
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<WindowAnalyticsDTO> getWindowAnalytics(
-            final String windowId) {
-        return windowRepository.findById(windowId).map(this::toWindowDto);
-    }
-
-    @Transactional(readOnly = true)
-    public List<WindowAnalyticsDTO> getWindowsByStatus(
-            final boolean isActive) {
-        return windowRepository.findByActive(isActive).stream()
-                .map(this::toWindowDto)
-                .toList();
-    }
 
     @Transactional
     public UserAnalyticsDTO saveUserAnalytics(
@@ -61,7 +26,6 @@ public class AnalyticsService {
         entity.setUserId(dto.getUserId());
         entity.setLoginCount(dto.getLoginCount());
         entity.setLastLogin(dto.getLastLogin());
-        entity.setPresetNames(dto.getPresetNames());
         entity.setTimestamp(dto.getTimestamp()
                 != null ? dto.getTimestamp() : LocalDateTime.now());
 
@@ -71,7 +35,7 @@ public class AnalyticsService {
 
     @Transactional
     public LocalDateTime recordUserLogin(
-            final String userId) {
+            final Long userId) {
         LocalDateTime now = LocalDateTime.now();
         userRepository.incrementLoginCount(userId, now);
         return now;
@@ -79,7 +43,7 @@ public class AnalyticsService {
 
     @Transactional(readOnly = true)
     public Optional<UserAnalyticsDTO> getUserAnalytics(
-            final String userId) {
+            final Long userId) {
         return userRepository.findById(userId).map(this::toUserDto);
     }
 
@@ -87,33 +51,34 @@ public class AnalyticsService {
     public PresetAnalyticsDTO savePresetAnalytics(
             final PresetAnalyticsDTO dto) {
         PresetAnalytics entity = new PresetAnalytics();
-        entity.setUserId(dto.getUserId());
+        entity.setDownloadsNumber((dto.getDownloadsNumber()));
         entity.setPresetName(dto.getPresetName());
-        entity.setDownloadedAt(dto.getDownloadedAt()
-                != null ? dto.getDownloadedAt() : LocalDateTime.now());
+        entity.setCreatedAt(dto.getCreatedAt()
+                != null ? dto.getCreatedAt() : LocalDateTime.now());
 
         PresetAnalytics saved = presetRepository.save(entity);
         return toPresetDto(saved);
     }
 
     @Transactional(readOnly = true)
-    public List<PresetAnalyticsDTO> getUserPresets(
-            final String userId) {
-        return presetRepository.findByUserId(userId).stream()
-                .map(this::toPresetDto)
-                .toList();
+    public Optional<PresetAnalyticsDTO> getPresetAnalytics(
+            final String presetName) {
+        return presetRepository.findByPresetName(presetName)
+                .stream()
+                .findFirst()
+                .map(this::toPresetDto);
     }
 
-    private WindowAnalyticsDTO toWindowDto(
-            final WindowAnalytics entity) {
-        return new WindowAnalyticsDTO(
-                entity.getWindowId(),
-                entity.isActive(),
-                entity.getSectionsCount(),
-                entity.getHeight(),
-                entity.getSectionSize(),
-                entity.getTimestamp()
-        );
+    @Transactional(readOnly = true)
+    public Optional<PresetAnalyticsDTO> getMostDownloadedPreset() {
+        return presetRepository.findTopByDownloadCount()
+                .map(this::toPresetDto);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<UserAnalyticsDTO> getUserWithEarliestLogin() {
+        return userRepository.findOldestLoggedInUser()
+                .map(this::toUserDto);
     }
 
     private UserAnalyticsDTO toUserDto(
@@ -122,7 +87,6 @@ public class AnalyticsService {
                 entity.getUserId(),
                 entity.getLoginCount(),
                 entity.getLastLogin(),
-                entity.getPresetNames(),
                 entity.getTimestamp()
         );
     }
@@ -131,9 +95,9 @@ public class AnalyticsService {
             final PresetAnalytics entity) {
         return new PresetAnalyticsDTO(
                 entity.getId(),
-                entity.getUserId(),
+                entity.getDownloadsNumber(),
                 entity.getPresetName(),
-                entity.getDownloadedAt()
+                entity.getCreatedAt()
         );
     }
 }

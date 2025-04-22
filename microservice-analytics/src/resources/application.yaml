@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: dev
   datasource:
     url: jdbc:postgresql://localhost:5432/smart_windows
     username: ${BD_LOGIN}
@@ -8,10 +10,6 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-  kafka:
-    bootstrap-servers: localhost:9092
-    topic:
-      name: tuple-topic
 
 springdoc:
   swagger-ui:
