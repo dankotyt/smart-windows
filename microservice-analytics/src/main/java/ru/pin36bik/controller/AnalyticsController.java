@@ -10,10 +10,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.Optional;
-
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ru.pin36bik.dto.PresetAnalyticsDTO;
 import ru.pin36bik.dto.UserAnalyticsDTO;
 import ru.pin36bik.service.AnalyticsService;
@@ -31,19 +35,23 @@ public class AnalyticsController {
         this.analyticsService = myAnalyticsService;
     }
 
-    @PostMapping(value = "/presets", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/presets",
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Создать новый пресет")
     @ApiResponses({
             @ApiResponse(responseCode = "200",
                     description = "Пресет успешно создан",
-                    content = @Content(schema = @Schema(implementation = PresetAnalyticsDTO.class))),
+                    content = @Content(schema =
+                    @Schema(implementation = PresetAnalyticsDTO.class))),
             @ApiResponse(responseCode = "400",
                     description = "Некорректные данные пресета")
     })
     public ResponseEntity<PresetAnalyticsDTO> createPreset(
-            @Parameter(description = "Данные пресета в формате JSON", required = true)
-            @Valid @RequestBody PresetAnalyticsDTO preset_analytics_DTO) {
-        return ResponseEntity.ok(analyticsService.savePresetAnalytics(preset_analytics_DTO));
+            @Parameter(description = "Данные пресета в формате JSON",
+                    required = true)
+            @Valid @RequestBody final PresetAnalyticsDTO preset_analytics_DTO) {
+        return ResponseEntity.ok(
+                analyticsService.savePresetAnalytics(preset_analytics_DTO));
     }
 
     @GetMapping("/presets/get-preset-by-name/{preset_name}")
@@ -59,15 +67,38 @@ public class AnalyticsController {
             @Parameter(description = "Название пресета",
                     required = true, example = "Test_Preset")
             @PathVariable final String preset_name) {
-        return ResponseEntity.ok(analyticsService.getPresetAnalytics(preset_name));
+        return ResponseEntity.ok(
+                analyticsService.getPresetAnalytics(preset_name));
+    }
+
+    @PostMapping(value = "/presets/downloads",
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Зарегистрировать загрузку "
+            + "пресета с заданным названием")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200",
+                    description = "Загрузка зарегистрирована",
+                    content = @Content(schema = @Schema(
+                            implementation = PresetAnalyticsDTO.class))),
+            @ApiResponse(responseCode = "400",
+                    description = "Некорректные данные!")
+    })
+    public ResponseEntity<LocalDateTime> recordPresetDownload(
+            @Parameter(description = "Название пресета в формате JSON",
+                    required = true)
+            @Valid @RequestBody final String presetName) {
+        return ResponseEntity.ok(
+                analyticsService.recordPresetDownload(presetName));
     }
 
     @GetMapping("/presets/most-downloaded")
-    @Operation(summary = "Получить самый популярный пресет (по количеству скачиваний)")
+    @Operation(summary =
+            "Получить самый популярный пресет (по количеству скачиваний)")
     @ApiResponses({
             @ApiResponse(responseCode = "200",
                     description = "Пресет найден",
-                    content = @Content(schema = @Schema(implementation = PresetAnalyticsDTO.class))),
+                    content = @Content(schema =
+                    @Schema(implementation = PresetAnalyticsDTO.class))),
             @ApiResponse(responseCode = "404",
                     description = "Пресеты не найдены")
     })
@@ -82,14 +113,17 @@ public class AnalyticsController {
     @ApiResponses({
             @ApiResponse(responseCode = "200",
                     description = "Пресет успешно создан",
-                    content = @Content(schema = @Schema(implementation = PresetAnalyticsDTO.class))),
+                    content = @Content(schema =
+                    @Schema(implementation = PresetAnalyticsDTO.class))),
             @ApiResponse(responseCode = "400",
                     description = "Некорректные данные пресета")
     })
-    public ResponseEntity<UserAnalyticsDTO> createPreset(
-            @Parameter(description = "Данные пресета в формате JSON", required = true)
-            @Valid @RequestBody UserAnalyticsDTO user_analytics_DTO) {
-        return ResponseEntity.ok(analyticsService.saveUserAnalytics(user_analytics_DTO));
+    public ResponseEntity<UserAnalyticsDTO> createUser(
+            @Parameter(description = "Данные пресета в формате JSON",
+                    required = true)
+            @Valid @RequestBody final UserAnalyticsDTO user_analytics_DTO) {
+        return ResponseEntity.ok(analyticsService
+                .saveUserAnalytics(user_analytics_DTO));
     }
 
     @PostMapping(value = "/users/logins",
@@ -132,7 +166,8 @@ public class AnalyticsController {
     @ApiResponses({
             @ApiResponse(responseCode = "200",
                     description = "Пользователь найден",
-                    content = @Content(schema = @Schema(implementation = UserAnalyticsDTO.class))),
+                    content = @Content(schema =
+                    @Schema(implementation = UserAnalyticsDTO.class))),
             @ApiResponse(responseCode = "404",
                     description = "Пользователи не найдены")
     })

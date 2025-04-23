@@ -71,6 +71,14 @@ public class AnalyticsService {
         return toPresetDto(saved);
     }
 
+    @Transactional
+    public LocalDateTime recordPresetDownload(
+            final String presetName) {
+        LocalDateTime now = LocalDateTime.now();
+        presetRepository.incrementDownloadsNumber(presetName, now);
+        return now;
+    }
+
     @Transactional(readOnly = true)
     public Optional<PresetAnalyticsDTO> getPresetAnalytics(
             final String presetName) {
@@ -78,7 +86,8 @@ public class AnalyticsService {
             return Optional.empty();
         }
 
-        List<PresetAnalytics> presets = presetRepository.findByPresetName(presetName);
+        List<PresetAnalytics> presets =
+                presetRepository.findByPresetName(presetName);
 
         if (presets.isEmpty()) {
             return Optional.empty();
