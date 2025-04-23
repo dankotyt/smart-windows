@@ -10,21 +10,21 @@ import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity
 @Getter
 @Setter
-@Table(name = "presets")
+@Entity
+@Table(name = "presets_analytics")
 public class PresetAnalytics {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
-    private String userId;
+    @Column(name = "downloads_number", nullable = false)
+    private Long downloadsNumber;
 
-    @Column(name = "presetName", nullable = false)
+    @Column(name = "preset_name", nullable = false)
     private String presetName;
 
-    @Column(name = "downloaded_at", nullable = false)
-    private LocalDateTime downloadedAt;
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
 }

@@ -15,12 +15,12 @@ import ru.pin36bik.repository.PresetRepository;
 public class PresetService {
 
     private final PresetRepository presetRepos;
-    private final KafkaTemplate<String, PresetDTO> kafkaTemplate;
+    private final KafkaTemplate<String, String> kafkaTemplate;
     private final ModelMapper modelMapper;
 
     @Autowired
     public PresetService(final PresetRepository myPresetRepos,
-                         final KafkaTemplate<String, PresetDTO> myKafkaTemplate,
+                         final KafkaTemplate<String, String> myKafkaTemplate,
                          final ModelMapper myModelMapper) {
         this.presetRepos = myPresetRepos;
         this.kafkaTemplate = myKafkaTemplate;
@@ -33,6 +33,8 @@ public class PresetService {
                 .orElseThrow(() ->
                         new RuntimeException(
                                 "Пресет не найден по идентификатору: " + id));
+        kafkaTemplate.send("preset-download-topic", preset.getPresetName());
+        System.out.println("Sent preset name " + preset.getPresetName());
         return modelMapper.map(preset, PresetDTO.class);
     }
 
@@ -40,9 +42,6 @@ public class PresetService {
     public PresetDTO createPreset(final PresetDTO presetDTO) {
         Preset preset = modelMapper.map(presetDTO, Preset.class);
         Preset savedPreset = presetRepos.save(preset);
-        kafkaTemplate.send(
-                "preset-topic", modelMapper.map(
-                        savedPreset, PresetDTO.class));
         return modelMapper.map(savedPreset, PresetDTO.class);
     }
 
@@ -54,9 +53,6 @@ public class PresetService {
                         "Preset not found with id: " + presetDTO.getId()));
         modelMapper.map(presetDTO, preset);
         Preset updatedPreset = presetRepos.save(preset);
-        kafkaTemplate.send(
-                "preset-topic", modelMapper.map(
-                        updatedPreset, PresetDTO.class));
         return modelMapper.map(updatedPreset, PresetDTO.class);
     }
 

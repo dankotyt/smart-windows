@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: dev
   datasource:
     url: jdbc:postgresql://localhost:5432/smart_windows
     username: ${BD_LOGIN}
@@ -10,8 +12,9 @@ spring:
     show-sql: true
   kafka:
     bootstrap-servers: localhost:9092
-    topic:
-      name: tuple-topic
+    consumer:
+      group-id: test-consumer-group
+      auto-offset-reset: earliest
 
 springdoc:
   swagger-ui:

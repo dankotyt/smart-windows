@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +20,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.pin36bik.dto.PresetAnalyticsDTO;
 import ru.pin36bik.dto.UserAnalyticsDTO;
-import ru.pin36bik.dto.WindowAnalyticsDTO;
 import ru.pin36bik.service.AnalyticsService;
 
 @RestController
-@RequestMapping(value = "/api/analytics",
+@RequestMapping(value = "/api/v0/analytics",
         produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Window Analytics API",
         description = "API для работы с данными об использовании умных окон")
@@ -37,53 +35,95 @@ public class AnalyticsController {
         this.analyticsService = myAnalyticsService;
     }
 
-    @PostMapping(value = "/windows",
+    @PostMapping(value = "/presets",
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Сохранить полученные данные окна")
+    @Operation(summary = "Создать новый пресет")
     @ApiResponses({
             @ApiResponse(responseCode = "200",
-                    description = "Данные сохранены",
+                    description = "Пресет успешно создан",
+                    content = @Content(schema =
+                    @Schema(implementation = PresetAnalyticsDTO.class))),
+            @ApiResponse(responseCode = "400",
+                    description = "Некорректные данные пресета")
+    })
+    public ResponseEntity<PresetAnalyticsDTO> createPreset(
+            @Parameter(description = "Данные пресета в формате JSON",
+                    required = true)
+            @Valid @RequestBody final PresetAnalyticsDTO preset_analytics_DTO) {
+        return ResponseEntity.ok(
+                analyticsService.savePresetAnalytics(preset_analytics_DTO));
+    }
+
+    @GetMapping("/presets/get-preset-by-name/{preset_name}")
+    @Operation(summary = "Найти пресет по его названию",
+            description = "Возвращает пресет по указанному названию")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Пресет успешно получен"),
+            @ApiResponse(responseCode = "404",
+                    description = "Пресет не найден")
+    })
+    public ResponseEntity<Optional<PresetAnalyticsDTO>> getPresetByName(
+            @Parameter(description = "Название пресета",
+                    required = true, example = "Test_Preset")
+            @PathVariable final String preset_name) {
+        return ResponseEntity.ok(
+                analyticsService.getPresetAnalytics(preset_name));
+    }
+
+    @PostMapping(value = "/presets/downloads",
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Зарегистрировать загрузку "
+            + "пресета с заданным названием")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200",
+                    description = "Загрузка зарегистрирована",
                     content = @Content(schema = @Schema(
-                            implementation = WindowAnalyticsDTO.class))),
+                            implementation = PresetAnalyticsDTO.class))),
             @ApiResponse(responseCode = "400",
                     description = "Некорректные данные!")
     })
-    public ResponseEntity<WindowAnalyticsDTO> saveWindowAnalytics(
-            @Parameter(description = "Данные окна в формате JSON",
+    public ResponseEntity<LocalDateTime> recordPresetDownload(
+            @Parameter(description = "Название пресета в формате JSON",
                     required = true)
-            @Valid @RequestBody final WindowAnalyticsDTO dto) {
-        return ResponseEntity.ok(analyticsService.saveWindowAnalytics(dto));
+            @Valid @RequestBody final String presetName) {
+        return ResponseEntity.ok(
+                analyticsService.recordPresetDownload(presetName));
     }
 
-    @GetMapping("/windows/{windowId}")
-    @Operation(summary = "Получить данные об окне по его ID")
+    @GetMapping("/presets/most-downloaded")
+    @Operation(summary =
+            "Получить самый популярный пресет (по количеству скачиваний)")
     @ApiResponses({
             @ApiResponse(responseCode = "200",
-                    description = "Данные успешно найдены",
-                    content = @Content(schema = @Schema(
-                            implementation = WindowAnalyticsDTO.class))),
+                    description = "Пресет найден",
+                    content = @Content(schema =
+                    @Schema(implementation = PresetAnalyticsDTO.class))),
             @ApiResponse(responseCode = "404",
-                    description = "Окно не найдено")
+                    description = "Пресеты не найдены")
     })
-    public ResponseEntity<Optional<WindowAnalyticsDTO>> getWindowAnalytics(
-            @Parameter(description = "ID окна",
-                    example = "window-123", required = true)
-            @PathVariable final String windowId) {
-        return ResponseEntity.ok(analyticsService.getWindowAnalytics(windowId));
+    public ResponseEntity<PresetAnalyticsDTO> getMostDownloadedPreset() {
+        return analyticsService.getMostDownloadedPreset()
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/windows/status/{active}")
-    @Operation(summary = "Получить список окон в определённом состоянии")
-    @ApiResponse(responseCode = "200",
-            description = "Список окон",
-            content = @Content(schema = @Schema(
-                    implementation = WindowAnalyticsDTO.class)))
-    public ResponseEntity<List<WindowAnalyticsDTO>> getWindowsByStatus(
-            @Parameter(description = "Эксплуатируется/не эксплуатируется",
-                    example = "true",
+    @PostMapping(value = "/users", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Создать нового пользователя")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200",
+                    description = "Пресет успешно создан",
+                    content = @Content(schema =
+                    @Schema(implementation = PresetAnalyticsDTO.class))),
+            @ApiResponse(responseCode = "400",
+                    description = "Некорректные данные пресета")
+    })
+    public ResponseEntity<UserAnalyticsDTO> createUser(
+            @Parameter(description = "Данные пресета в формате JSON",
                     required = true)
-            @PathVariable final boolean active) {
-        return ResponseEntity.ok(analyticsService.getWindowsByStatus(active));
+            @Valid @RequestBody final UserAnalyticsDTO user_analytics_DTO) {
+        return ResponseEntity.ok(analyticsService
+                .saveUserAnalytics(user_analytics_DTO));
     }
 
     @PostMapping(value = "/users/logins",
@@ -101,24 +141,39 @@ public class AnalyticsController {
     public ResponseEntity<LocalDateTime> recordUserLogin(
             @Parameter(description = "ID пользователя в формате JSON",
                     required = true)
-            @Valid @RequestBody final String userId) {
+            @Valid @RequestBody final Long userId) {
         return ResponseEntity.ok(analyticsService.recordUserLogin(userId));
     }
 
-    @GetMapping("/presets/{userId}")
-    @Operation(summary = "Получить пресеты, загруженные пользователем")
+    @GetMapping("/users/get-user-by-id/{user_id}")
+    @Operation(summary = "Найти пользователя по его ID",
+            description = "Возвращает запись о пользователе по указанному ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Пользователь успешно получен"),
+            @ApiResponse(responseCode = "404",
+                    description = "Пользователь не найден")
+    })
+    public ResponseEntity<Optional<UserAnalyticsDTO>> getUserById(
+            @Parameter(description = "Идентификатор пользователя",
+                    required = true, example = "12345")
+            @PathVariable final Long user_id) {
+        return ResponseEntity.ok(analyticsService.getUserAnalytics(user_id));
+    }
+
+    @GetMapping("/users/earliest-login")
+    @Operation(summary = "Получить пользователя с самым старым логином")
     @ApiResponses({
             @ApiResponse(responseCode = "200",
-                    description = "Список пресетов",
-                    content = @Content(schema = @Schema(
-                            implementation = PresetAnalyticsDTO.class))),
+                    description = "Пользователь найден",
+                    content = @Content(schema =
+                    @Schema(implementation = UserAnalyticsDTO.class))),
             @ApiResponse(responseCode = "404",
-                    description = "Пользователь не найден!")
+                    description = "Пользователи не найдены")
     })
-    public ResponseEntity<List<PresetAnalyticsDTO>> getUserPresets(
-            @Parameter(description = "ID пользователя",
-                    example = "user-456", required = true)
-            @PathVariable final String userId) {
-        return ResponseEntity.ok(analyticsService.getUserPresets(userId));
+    public ResponseEntity<UserAnalyticsDTO> getUserWithEarliestLogin() {
+        return analyticsService.getUserWithEarliestLogin()
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }
