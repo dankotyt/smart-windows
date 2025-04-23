@@ -18,11 +18,13 @@ dependencyResolutionManagement {
 
 rootProject.name = "smart-windows"
 include(
-    "microservice-weather",
-    "microservice-user-management",
-    "microservice-analytics",
-    "microservice-notifications",
-    "microservice-presets",
-    "microservice-visual-content",
-    "microservice-window-management"
+    ":microservice-weather",
+    ":microservice-user-management",
+    ":microservice-analytics",
+    ":microservice-notifications",
+    ":microservice-presets",
+    ":microservice-visual-content",
+    ":microservice-window-management",
+    ":api-gateway"
 )
+

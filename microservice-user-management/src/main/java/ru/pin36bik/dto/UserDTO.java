@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * UserDTO - сущность, которая передает данные между контроллером
@@ -34,4 +36,7 @@ public class UserDTO {
     @Email(message = "Некорректный email!")
     @JsonProperty("email")
     private String email;
+
+    @JsonProperty("windowIds")
+    private List<Long> windowId = new ArrayList<>();
 }

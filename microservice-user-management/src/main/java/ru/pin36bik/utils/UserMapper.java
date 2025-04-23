@@ -10,7 +10,7 @@ public class UserMapper {
 
     public UserDTO toDTO(User user) {
         UserDTO dto = new UserDTO();
-        dto.setId(user.getUserId());
+        dto.setId(user.getId());
         dto.setName(user.getName());
         dto.setSurname(user.getSurname());
         dto.setBirthday(user.getBirthday());
@@ -20,7 +20,7 @@ public class UserMapper {
 
     public UserDTOForAdmin toDTOForAdmin(User user) {
         UserDTOForAdmin dto = new UserDTOForAdmin();
-        dto.setId(user.getUserId());
+        dto.setId(user.getId());
         dto.setName(user.getName());
         dto.setSurname(user.getSurname());
         dto.setBirthday(user.getBirthday());

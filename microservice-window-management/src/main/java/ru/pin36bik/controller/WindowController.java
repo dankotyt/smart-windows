@@ -1,26 +1,26 @@
 package ru.pin36bik.controller;
 
+import ru.pin36bik.dto.WindowCreateRequest;
+import ru.pin36bik.dto.WindowResponse;
 import ru.pin36bik.dto.WindowUserDTO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.pin36bik.service.WindowService;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("api/v1/windows")
+@RequestMapping("/api/windows")
 public class WindowController {
+    private WindowService windowService;
 
-    private final WindowService windowService;
-
-    @Autowired
-    public WindowController(WindowService windowService) {
-        this.windowService = windowService;
+    @PostMapping("/add")
+    public ResponseEntity<WindowResponse> addUserWindow(@RequestBody WindowCreateRequest createRequest) {
+        return ResponseEntity.ok(windowService.addWindow(createRequest));
     }
 
-//    @PostMapping("/add-window")
-//    public ResponseEntity<WindowUserDTO> addWindow(@RequestHeader() String token,
-//                                                   @RequestBody AddW) {
-//
-//    }
-
+    @GetMapping("/user/{id}")
+    public ResponseEntity<List<WindowUserDTO>> getWindowsByUserId(@PathVariable Long id) {
+        return ResponseEntity.ok(windowService.findByUserId(id));
+    }
 }

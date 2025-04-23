@@ -2,6 +2,7 @@ package ru.pin36bik.entity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_seq")
     @Column(updatable = false, unique = true, name = "id")
-    private Long userId;
+    private Long id;
 
     @Column(nullable = false)
     private String name;
@@ -87,18 +88,18 @@ public class User implements UserDetails {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof User user)) return false;
-        return userId.equals(user.userId);
+        return id.equals(user.id);
     }
 
     @Override
     public int hashCode() {
-        return userId.hashCode();
+        return id.hashCode();
     }
 
     @Override
     public String toString() {
         return "User{" +
-                "userId=" + userId +
+                "userId=" + id +
                 ", name='" + name + '\'' +
                 ", lastName='" + surname + '\'' +
                 ", birthday=" + birthday +

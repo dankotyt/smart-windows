@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 public class WindowUserDTO {
-    private Long id;
     private Long windowId;
     private Long userId;
     private String name;

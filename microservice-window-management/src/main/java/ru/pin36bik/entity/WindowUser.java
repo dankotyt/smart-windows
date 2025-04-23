@@ -17,14 +17,13 @@ public class WindowUser {
     @Column(name = "window_id", nullable = false)
     private Long windowId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "user_id")
+    private Long userId;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name")
     private String name;
 
-    @Column(name = "status", nullable = false)
+    @Column(name = "status")
     private boolean status;
 
     @Column(name = "presets")

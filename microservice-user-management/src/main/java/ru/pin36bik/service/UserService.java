@@ -3,6 +3,7 @@ package ru.pin36bik.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import ru.pin36bik.dto.UserDTOForAdmin;
+import ru.pin36bik.dto.WindowUserDTO;
 import ru.pin36bik.entity.ArchivedUser;
 import ru.pin36bik.exceptions.EmailBusyException;
 import ru.pin36bik.exceptions.UserNotFoundException;
@@ -12,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import ru.pin36bik.feign.WindowServiceClient;
 import ru.pin36bik.repository.ArchivedUserRepository;
 import ru.pin36bik.repository.UserRepository;
 import ru.pin36bik.utils.UserMapper;
@@ -27,6 +29,7 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final ArchivedUserRepository archivedUserRepository;
     private final UserMapper userMapper;
+    private final WindowServiceClient windowServiceClient;
     //private final EmailService emailService // для восстановления пароля
 
     @Transactional(readOnly = true)
@@ -98,5 +101,11 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден с таким email: " + email));
+    }
+
+    //=============================WINDOWS===========================
+
+    public List<WindowUserDTO> getWindows(Long id) {
+        return windowServiceClient.getWindowsByUserId(id);
     }
 }

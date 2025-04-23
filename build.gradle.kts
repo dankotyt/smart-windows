@@ -13,8 +13,7 @@ java {
 	}
 }
 
-// Добавьте это для управления версиями Spring Cloud
-extra["springCloudVersion"] = "2023.0.0" // или актуальная версия
+extra["springCloudVersion"] = "2023.0.0"
 
 configurations {
 	compileOnly {

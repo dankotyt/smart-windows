@@ -77,7 +77,7 @@ class UserTest {
 
         userRepository.save(user);
 
-        userId = user.getUserId();
+        userId = user.getId();
 
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
@@ -198,7 +198,7 @@ class UserTest {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found!"));
 
-        userId = user.getUserId();
+        userId = user.getId();
         mockMvc.perform(MockMvcRequestBuilders.get("/user/get_by_id/{id}",
                                 userId.toString())
                         .contentType(MediaType.APPLICATION_JSON))
@@ -231,7 +231,7 @@ class UserTest {
         User user = userRepository.findByEmail("test@gmail.com")
                 .orElseThrow(() -> new RuntimeException("User not found!"));
 
-        userId = user.getUserId();
+        userId = user.getId();
         mockMvc.perform(MockMvcRequestBuilders.delete("/user/delete/{id}",
                                 userId.toString()) // Используем {id} для PathVariable
                         .with(csrf())) // Добавляем CSRF-токен
@@ -259,7 +259,7 @@ class UserTest {
         Optional<ArchivedUser> archivedUser = archivedUserRepository.findByEmail("john.doe@example.com");
         assertTrue(archivedUser.isPresent());
         assertEquals("John", archivedUser.get().getName());
-        assertEquals("Doe", archivedUser.get().getLastName());
+        assertEquals("Doe", archivedUser.get().getSurname());
     }
 }
 

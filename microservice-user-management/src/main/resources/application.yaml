@@ -25,3 +25,11 @@ logging:
     org.springframework.security: DEBUG
     org.springframework.web: DEBUG
     ru.pin36bik: DEBUG
+
+server:
+  port: 8082
+  #forward-headers-strategy: framework
+
+window:
+  service:
+    url: http://localhost:8083
