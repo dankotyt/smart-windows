@@ -31,8 +31,6 @@ dependencies {
     compileOnly("org.projectlombok:lombok")
 
     annotationProcessor("org.projectlombok:lombok")
-
-    implementation(project(":microservice-user-management"))
 }
 
 tasks.test {

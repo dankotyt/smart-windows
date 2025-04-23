@@ -7,7 +7,7 @@ import ru.pin36bik.dto.WindowUserDTO;
 
 import java.util.List;
 
-@FeignClient(name = "window-service")
+@FeignClient(name = "window-service", url = "${window.service.url}")
 public interface WindowServiceClient {
     @GetMapping("/api/windows/user/{id}")
     List<WindowUserDTO> getWindowsByUserId(@PathVariable Long id);
