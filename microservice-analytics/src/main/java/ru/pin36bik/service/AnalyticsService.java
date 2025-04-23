@@ -1,6 +1,7 @@
 package ru.pin36bik.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,17 @@ public class AnalyticsService {
     @Transactional(readOnly = true)
     public Optional<UserAnalyticsDTO> getUserAnalytics(
             final Long userId) {
-        return userRepository.findById(userId).map(this::toUserDto);
+        if (userId == null) {
+            return Optional.empty();
+        }
+
+        List<UserAnalytics> users = userRepository.findByUserId(userId);
+
+        if (users.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(toUserDto(users.getFirst()));
     }
 
     @Transactional
@@ -63,15 +74,22 @@ public class AnalyticsService {
     @Transactional(readOnly = true)
     public Optional<PresetAnalyticsDTO> getPresetAnalytics(
             final String presetName) {
-        return presetRepository.findByPresetName(presetName)
-                .stream()
-                .findFirst()
-                .map(this::toPresetDto);
+        if (presetName == null || presetName.isBlank()) {
+            return Optional.empty();
+        }
+
+        List<PresetAnalytics> presets = presetRepository.findByPresetName(presetName);
+
+        if (presets.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(toPresetDto(presets.getFirst()));
     }
 
     @Transactional(readOnly = true)
     public Optional<PresetAnalyticsDTO> getMostDownloadedPreset() {
-        return presetRepository.findTopByDownloadCount()
+        return presetRepository.findTopByDownloadsNumber()
                 .map(this::toPresetDto);
     }
 

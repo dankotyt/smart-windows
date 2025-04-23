@@ -22,7 +22,7 @@ public class PresetAnalytics {
     @Column(name = "downloads_number", nullable = false)
     private Long downloadsNumber;
 
-    @Column(name = "presetName", nullable = false)
+    @Column(name = "preset_name", nullable = false)
     private String presetName;
 
     @Column(name = "created_at", nullable = false)

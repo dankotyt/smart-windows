@@ -18,7 +18,7 @@ public interface UserAnalyticsRepository
         extends JpaRepository<UserAnalytics, Long> {
     List<UserAnalytics> findByUserId(Long userId);
 
-    @Query("SELECT u FROM User u ORDER BY u.lastLoginDate ASC LIMIT 1")
+    @Query("SELECT u FROM UserAnalytics u ORDER BY u.lastLogin ASC LIMIT 1")
     Optional<UserAnalytics> findOldestLoggedInUser();
 
     @Modifying

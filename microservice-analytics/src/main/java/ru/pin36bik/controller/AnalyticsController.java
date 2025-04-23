@@ -46,7 +46,7 @@ public class AnalyticsController {
         return ResponseEntity.ok(analyticsService.savePresetAnalytics(preset_analytics_DTO));
     }
 
-    @GetMapping("/presets/get-preset-by-name/{name}")
+    @GetMapping("/presets/get-preset-by-name/{preset_name}")
     @Operation(summary = "Найти пресет по его названию",
             description = "Возвращает пресет по указанному названию")
     @ApiResponses(value = {
@@ -57,7 +57,7 @@ public class AnalyticsController {
     })
     public ResponseEntity<Optional<PresetAnalyticsDTO>> getPresetByName(
             @Parameter(description = "Название пресета",
-                    required = true, example = "Test Preset")
+                    required = true, example = "Test_Preset")
             @PathVariable final String preset_name) {
         return ResponseEntity.ok(analyticsService.getPresetAnalytics(preset_name));
     }
@@ -111,17 +111,17 @@ public class AnalyticsController {
         return ResponseEntity.ok(analyticsService.recordUserLogin(userId));
     }
 
-    @GetMapping("/presets/get-user-by-id/{id}")
+    @GetMapping("/users/get-user-by-id/{user_id}")
     @Operation(summary = "Найти пользователя по его ID",
             description = "Возвращает запись о пользователе по указанному ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
-                    description = "Пресет успешно получен"),
+                    description = "Пользователь успешно получен"),
             @ApiResponse(responseCode = "404",
-                    description = "Пресет не найден")
+                    description = "Пользователь не найден")
     })
     public ResponseEntity<Optional<UserAnalyticsDTO>> getUserById(
-            @Parameter(description = "Название пресета",
+            @Parameter(description = "Идентификатор пользователя",
                     required = true, example = "12345")
             @PathVariable final Long user_id) {
         return ResponseEntity.ok(analyticsService.getUserAnalytics(user_id));

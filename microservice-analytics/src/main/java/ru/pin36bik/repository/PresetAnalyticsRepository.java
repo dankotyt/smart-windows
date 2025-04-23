@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.pin36bik.entity.PresetAnalytics;
 
@@ -13,8 +14,9 @@ import ru.pin36bik.entity.PresetAnalytics;
 @Table(name = "presets_analytics")
 public interface PresetAnalyticsRepository
         extends JpaRepository<PresetAnalytics, String> {
-    List<PresetAnalytics> findByPresetName(String name);
+    @Query("SELECT p FROM PresetAnalytics p WHERE LOWER(p.presetName) = LOWER(:preset_name)")
+    List<PresetAnalytics> findByPresetName(@Param("preset_name") String preset_name);
 
-    @Query("SELECT p FROM Preset p ORDER BY p.downloadCount DESC LIMIT 1")
-    Optional<PresetAnalytics> findTopByDownloadCount();
+    @Query("SELECT p FROM PresetAnalytics p ORDER BY p.downloadsNumber DESC LIMIT 1")
+    Optional<PresetAnalytics> findTopByDownloadsNumber();
 }
