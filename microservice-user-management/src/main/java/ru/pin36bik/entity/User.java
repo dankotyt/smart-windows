@@ -2,54 +2,61 @@ package ru.pin36bik.entity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
-/**
- * User - сущность, которая будет передаваться в БД.
- * Отличается от UserDTO только тем, что тут хранятся те данные,
- * которые пользователь не увидит.
- * */
+import ru.pin36bik.entity.role.Role;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 @Table(name = "users")
 public class User implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long userId;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_seq")
+    @Column(updatable = false, unique = true, name = "id")
+    private Long id;
 
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private String lastName;
+    @Column(nullable = false, name = "surname")
+    private String surname;
 
     @Column(nullable = false)
     private LocalDate birthday;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String email;
 
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false, updatable = false)
+    @CreationTimestamp
     private LocalDateTime createdAt;
+
+    @Column(name = "refresh_token")
+    private String refreshToken;
+
+    @Column(name = "refresh_token_expiry")
+    private LocalDateTime refreshTokenExpiry;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return List.of(new SimpleGrantedAuthority(role.getAuthority()));
     }
 
     @Override
@@ -57,6 +64,48 @@ public class User implements UserDetails {
         return email;
     }
 
-    //location по API
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User user)) return false;
+        return id.equals(user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId=" + id +
+                ", name='" + name + '\'' +
+                ", lastName='" + surname + '\'' +
+                ", birthday=" + birthday +
+                ", email='" + email + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
+    }
+    //location по API
 }

@@ -1,25 +1,36 @@
 package ru.pin36bik.service;
 
+import lombok.RequiredArgsConstructor;
+import ru.pin36bik.dto.WindowRequest;
+import ru.pin36bik.dto.WindowResponse;
 import ru.pin36bik.dto.WindowUserDTO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.pin36bik.repository.UserRepository;
+import ru.pin36bik.entity.WindowUser;
 import ru.pin36bik.repository.WindowRepository;
+import ru.pin36bik.utils.WindowMapper;
+
+import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class WindowService {
-    private final WindowRepository windowManagementRepository;
-    private final UserRepository userRepository;
+    private final WindowRepository windowRepository;
+    private final WindowMapper windowMapper;
 
-    @Autowired
-    public WindowService(WindowRepository windowManagementRepository,
-                         UserRepository userRepository) {
-        this.windowManagementRepository = windowManagementRepository;
-        this.userRepository = userRepository;
+    public List<WindowUserDTO> findByUserEmail(String userEmail) {
+        return windowRepository.findByUserEmail(userEmail).stream()
+                .map(windowMapper::convertToDTO)
+                .toList();
     }
 
-    public WindowUserDTO addWindowToUser(String windowId, String userId, String name,
-                                         String location) {
+    public WindowResponse addWindow(WindowRequest request, String userEmail) {
+        WindowUser windowUser = new WindowUser();
+        windowUser.setWindowId(request.getWindowId());
+        windowUser.setUserEmail(userEmail);
+        windowUser.setName(request.getName());
+        windowUser.setStatus(true);
 
+        WindowUser saved = windowRepository.save(windowUser);
+        return windowMapper.toResponse(saved);
     }
 }

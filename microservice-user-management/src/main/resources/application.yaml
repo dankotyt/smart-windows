@@ -1,8 +1,9 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/users_db
-    username: ${USER_DB_LOGIN} #${ALL_PRIVILEGES_USER_LOGIN}
-    password: ${USER_DB_PASSWORD} #${ALL_PRIVILEGES_USER_PASSWORD}
+    url: jdbc:postgresql://localhost:5432/users_db?currentSchema=public
+    username: ${ALL_PRIVILEGES_USER_LOGIN} #${USER_DB_LOGIN}
+    password: ${ALL_PRIVILEGES_USER_PASSWORD} #${USER_DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
@@ -10,3 +11,24 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        default_schema: public
+    database: postgresql
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-ttl: ${JWT_ACCESS_TTL}
+  refresh-ttl: ${JWT_REFRESH_TTL}
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    ru.pin36bik: DEBUG
+
+server:
+  port: 8082
+
+window:
+  service:
+    url: http://localhost:8083

@@ -1,0 +1,4 @@
+#spring:
+#  cloud:
+#    config:
+#      url=${CONFIG_SERVER_URL:http://localhost:8888}

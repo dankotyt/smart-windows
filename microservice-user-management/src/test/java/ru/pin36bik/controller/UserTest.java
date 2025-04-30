@@ -14,8 +14,8 @@ import org.springframework.test.context.ActiveProfiles;
 
 import ru.pin36bik.MicroserviceUsersApplication;
 import ru.pin36bik.dto.UserDTO;
-import ru.pin36bik.dto.UserLoginDTO;
-import ru.pin36bik.dto.UserRegistrationDTO;
+import ru.pin36bik.dto.LoginRequest;
+import ru.pin36bik.dto.RegisterRequest;
 import ru.pin36bik.entity.ArchivedUser;
 import ru.pin36bik.entity.User;
 import ru.pin36bik.repository.ArchivedUserRepository;
@@ -32,6 +32,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -69,15 +70,14 @@ class UserTest {
 
         User user = new User();
         user.setName("Test");
-        user.setLastName("User");
+        user.setSurname("User");
         user.setBirthday(LocalDate.of(1990, 1, 1));
         user.setEmail("test@gmail.com");
         user.setPassword(passwordEncoder.encode("password"));
-        user.setCreatedAt(LocalDateTime.now());
 
         userRepository.save(user);
 
-        userId = user.getUserId();
+        userId = user.getId();
 
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
@@ -91,14 +91,14 @@ class UserTest {
     @Test
     void testRegisterUser() throws Exception {
 
-        UserRegistrationDTO registrationDTO = new UserRegistrationDTO();
+        RegisterRequest registrationDTO = new RegisterRequest();
         registrationDTO.setName("John");
-        registrationDTO.setLastName("Smith");
+        registrationDTO.setSurname("Smith");
         registrationDTO.setBirthday(LocalDate.of(1990, 1, 1));
         registrationDTO.setEmail("john.smith@gmail.com");
         registrationDTO.setPassword("password");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/user/register")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/register")
                         .with(csrf().asHeader()) // Добавляем CSRF-токен в заголовок
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registrationDTO)))
@@ -116,22 +116,21 @@ class UserTest {
         // Создаем пользователя с email "john.smith@gmail.com"
         User existingUser = new User();
         existingUser.setName("Existing");
-        existingUser.setLastName("User");
+        existingUser.setSurname("User");
         existingUser.setBirthday(LocalDate.of(1990, 1, 1));
         existingUser.setEmail("john.smith@gmail.com");
         existingUser.setPassword(passwordEncoder.encode("password"));
-        existingUser.setCreatedAt(LocalDateTime.now());
         userRepository.save(existingUser);
 
         // Пытаемся зарегистрировать нового пользователя с тем же email
-        UserRegistrationDTO registrationDTO = new UserRegistrationDTO();
+        RegisterRequest registrationDTO = new RegisterRequest();
         registrationDTO.setName("John");
-        registrationDTO.setLastName("Smith");
+        registrationDTO.setSurname("Smith");
         registrationDTO.setBirthday(LocalDate.of(1990, 1, 1));
         registrationDTO.setEmail("john.smith@gmail.com");
         registrationDTO.setPassword("password");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/user/register")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/register")
                         .with(csrf().asHeader()) // Добавляем CSRF-токен в заголовок
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registrationDTO)))
@@ -142,11 +141,11 @@ class UserTest {
     @Test
     @WithMockUser
     void testAuthorizeUser() throws Exception {
-        UserLoginDTO loginDTO = new UserLoginDTO();
+        LoginRequest loginDTO = new LoginRequest();
         loginDTO.setEmail("test@gmail.com");
         loginDTO.setPassword("password");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/user/login")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/login")
                         .with(csrf()) // Добавляем CSRF-токен
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(loginDTO)))
@@ -159,11 +158,11 @@ class UserTest {
 
     @Test
     void testAuthorizeUserWithoutCsrf() throws Exception {
-        UserLoginDTO loginDTO = new UserLoginDTO();
+        LoginRequest loginDTO = new LoginRequest();
         loginDTO.setEmail("test@gmail.com");
         loginDTO.setPassword("password");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/user/login")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(loginDTO)))
                 .andExpect(MockMvcResultMatchers.status().isForbidden()); // Ожидаем 403
@@ -199,9 +198,9 @@ class UserTest {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found!"));
 
-        Long userId = user.getUserId();
+        userId = user.getId();
         mockMvc.perform(MockMvcRequestBuilders.get("/user/get_by_id/{id}",
-                                userId)
+                                userId.toString())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Test"))
@@ -215,7 +214,7 @@ class UserTest {
 
         UserDTO userDTO = new UserDTO();
         userDTO.setName("Max");
-        userDTO.setLastName("Smith");
+        userDTO.setSurname("Smith");
 
         mockMvc.perform(MockMvcRequestBuilders.put("/user/update")
                         .with(csrf()) // Добавляем CSRF-токен
@@ -232,9 +231,9 @@ class UserTest {
         User user = userRepository.findByEmail("test@gmail.com")
                 .orElseThrow(() -> new RuntimeException("User not found!"));
 
-        Long userId = user.getUserId();
+        userId = user.getId();
         mockMvc.perform(MockMvcRequestBuilders.delete("/user/delete/{id}",
-                                userId) // Используем {id} для PathVariable
+                                userId.toString()) // Используем {id} для PathVariable
                         .with(csrf())) // Добавляем CSRF-токен
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
@@ -245,7 +244,7 @@ class UserTest {
     void testDeleteAndArchiveUser() {
         User user = new User();
         user.setName("John");
-        user.setLastName("Doe");
+        user.setSurname("Doe");
         user.setBirthday(LocalDate.of(1990, 1, 1));
         user.setEmail("john.doe@example.com");
         user.setPassword("password");
@@ -260,7 +259,7 @@ class UserTest {
         Optional<ArchivedUser> archivedUser = archivedUserRepository.findByEmail("john.doe@example.com");
         assertTrue(archivedUser.isPresent());
         assertEquals("John", archivedUser.get().getName());
-        assertEquals("Doe", archivedUser.get().getLastName());
+        assertEquals("Doe", archivedUser.get().getSurname());
     }
 }
 

@@ -1,6 +1,6 @@
 plugins {
 	java
-	id("org.springframework.boot") version "3.4.3"
+	id("org.springframework.boot") version "3.2.0" //3.4.3
 	id("io.spring.dependency-management") version "1.1.7"
 }
 
@@ -13,29 +13,23 @@ java {
 	}
 }
 
+extra["springCloudVersion"] = "2023.0.0"
+
 configurations {
 	compileOnly {
 		extendsFrom(configurations.annotationProcessor.get())
 	}
 }
 
-repositories {
-	mavenCentral()
-}
+// Применяем dependencyManagement для всех подпроектов
+subprojects {
+	apply(plugin = "io.spring.dependency-management")
 
-dependencies {
-	implementation(project(":microservice-presets"))
-	implementation(project(":microservice-user-management"))
-	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-	implementation("org.springframework.boot:spring-boot-starter-web")
-	implementation("org.springframework.boot:spring-boot-starter-validation")
-	implementation("org.modelmapper:modelmapper:2.4.4")
-	implementation ("io.github.cdimascio:dotenv-java:3.0.0")
-	compileOnly("org.projectlombok:lombok")
-	annotationProcessor("org.projectlombok:lombok")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-	implementation("org.springframework.kafka:spring-kafka")
+	dependencyManagement {
+		imports {
+			mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
+		}
+	}
 }
 
 tasks.withType<Test> {
