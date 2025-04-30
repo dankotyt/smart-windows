@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Setter
 public class WindowUserDTO {
     private Long windowId;
-    private Long userId;
+    private String userEmail;
     private String name;
     private boolean status;
     private String presets;

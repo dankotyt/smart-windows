@@ -8,7 +8,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import ru.pin36bik.config.JwtConfig;
 
 @SpringBootApplication
-@EnableFeignClients(basePackages = "ru.pin36bik.feign")
 @EnableConfigurationProperties(JwtConfig.class)
 public class MicroserviceUsersApplication {
     public static void main(String[] args) {

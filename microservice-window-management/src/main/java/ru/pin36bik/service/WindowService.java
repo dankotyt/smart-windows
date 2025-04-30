@@ -1,7 +1,7 @@
 package ru.pin36bik.service;
 
 import lombok.RequiredArgsConstructor;
-import ru.pin36bik.dto.WindowCreateRequest;
+import ru.pin36bik.dto.WindowRequest;
 import ru.pin36bik.dto.WindowResponse;
 import ru.pin36bik.dto.WindowUserDTO;
 import org.springframework.stereotype.Service;
@@ -17,26 +17,20 @@ public class WindowService {
     private final WindowRepository windowRepository;
     private final WindowMapper windowMapper;
 
-    public List<WindowUserDTO> findByUserId(Long userId) {
-        return windowRepository.findByUserId(userId).stream()
+    public List<WindowUserDTO> findByUserEmail(String userEmail) {
+        return windowRepository.findByUserEmail(userEmail).stream()
                 .map(windowMapper::convertToDTO)
                 .toList();
     }
 
-    public WindowResponse addWindow(WindowCreateRequest request) {
+    public WindowResponse addWindow(WindowRequest request, String userEmail) {
         WindowUser windowUser = new WindowUser();
         windowUser.setWindowId(request.getWindowId());
-        windowUser.setUserId(request.getUserId());
+        windowUser.setUserEmail(userEmail);
         windowUser.setName(request.getName());
         windowUser.setStatus(true);
 
         WindowUser saved = windowRepository.save(windowUser);
-        return new WindowResponse(
-                saved.getWindowId(),
-                saved.getUserId(),
-                saved.getName(),
-                saved.isStatus(),
-                saved.getPresets()
-        );
+        return windowMapper.toResponse(saved);
     }
 }

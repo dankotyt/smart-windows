@@ -5,13 +5,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import ru.pin36bik.dto.UserDTO;
 import ru.pin36bik.dto.UserDTOForAdmin;
-import ru.pin36bik.dto.WindowUserDTO;
 import ru.pin36bik.entity.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import ru.pin36bik.feign.WindowServiceClient;
 import ru.pin36bik.service.CookieService;
 import ru.pin36bik.service.UserService;
 
@@ -62,9 +60,4 @@ public class UserController {
 
     //=============================WINDOWS===========================
 
-    @GetMapping("/{id}/windows")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<WindowUserDTO>> getUserWindows(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getWindows(id));
-    }
 }

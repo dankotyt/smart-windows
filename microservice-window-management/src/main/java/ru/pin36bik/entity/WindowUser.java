@@ -17,8 +17,8 @@ public class WindowUser {
     @Column(name = "window_id", nullable = false)
     private Long windowId;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @Column(name = "user_email")
+    private String userEmail;
 
     @Column(name = "name")
     private String name;

@@ -7,14 +7,9 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.pin36bik.repository.UserRepository;
 import ru.pin36bik.security.jwt.JwtTokenFactory;
 import ru.pin36bik.security.jwt.JwtTokenParser;
@@ -38,38 +33,21 @@ public class JwtConfig {
         return new JwtTokenFactory(secretKey, accessTtl, refreshTtl);
     }
 
-    @Bean
+    @Bean("userManagementSecretKey")
+    @Primary
     public SecretKey secretKey() {
-        byte[] decodedKey = Base64.getDecoder().decode(secret);
+        byte[] decodedKey = Base64.getDecoder().decode(secret.trim());
         return Keys.hmacShaKeyFor(decodedKey);
     }
 
-    @Bean
+    @Bean("userManagementJwtTokenParser")
+    @Primary
     public JwtTokenParser jwtTokenParser(SecretKey secretKey) {
         return new JwtTokenParser(secretKey);
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден!"));
-    }
-
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService());
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
-
-    @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(12);
     }
 }

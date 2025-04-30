@@ -5,8 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class WindowCreateRequest {
-    Long windowId;
-    String name;
-    Long userId;
+public class WindowRequest {
+    private Long windowId;
+    private String name;
 }

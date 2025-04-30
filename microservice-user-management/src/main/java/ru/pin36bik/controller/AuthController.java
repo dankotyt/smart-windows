@@ -2,6 +2,8 @@ package ru.pin36bik.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.pin36bik.dto.RegisterRequest;
@@ -14,6 +16,7 @@ import ru.pin36bik.service.CookieService;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
     private final AuthService authService;
     private final CookieService cookieService;
@@ -60,12 +63,25 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(
-            @CookieValue(value = "__Host-refresh", required = false) String refreshToken,
+            @CookieValue("__Host-refresh") String refreshToken,
             HttpServletResponse response) {
-        if (refreshToken != null) {
-            authService.logout(refreshToken);
-        }
+
+        authService.logout(refreshToken);
         cookieService.expireAllCookies(response);
-        return ResponseEntity.ok().build(); //ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/validate")
+    public ResponseEntity<Void> validateToken(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
+        try {
+            String token = authHeader.substring(7);
+            log.debug("Validating token: {}", token);
+            authService.validate(token);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            log.error("Token validation failed", e);
+            throw e;
+        }
     }
 }

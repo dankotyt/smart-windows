@@ -28,7 +28,6 @@ logging:
 
 server:
   port: 8082
-  #forward-headers-strategy: framework
 
 window:
   service:

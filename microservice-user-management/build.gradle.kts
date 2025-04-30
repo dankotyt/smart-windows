@@ -35,8 +35,6 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:0.12.3")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
 
-    implementation(project(":microservice-window-management"))
-
     compileOnly ("org.springframework.boot:spring-boot-starter-security")
     compileOnly("org.projectlombok:lombok")
 

@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 public class WindowResponse {
     private Long window_id;
-    private Long user_id;
+    private String userEmail;
     private String name;
     private boolean status;
     private String presets;

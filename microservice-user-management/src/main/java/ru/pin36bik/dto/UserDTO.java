@@ -36,7 +36,4 @@ public class UserDTO {
     @Email(message = "Некорректный email!")
     @JsonProperty("email")
     private String email;
-
-    @JsonProperty("windowIds")
-    private List<Long> windowId = new ArrayList<>();
 }

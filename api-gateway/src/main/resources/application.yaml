@@ -1,4 +1,10 @@
 spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+  main:
+    web-application-type: reactive
   cloud:
     gateway:
       routes:
@@ -7,7 +13,7 @@ spring:
           predicates:
             - Path=/api/user/**
           filters:
-            - TokenRelay
+            - GatewayJwtFilter
 
         - id: microservice-user-management
           uri: http://localhost:8082
@@ -19,39 +25,62 @@ spring:
           predicates:
             - Path=/api/windows/**
           filters:
-            - TokenRelay
+            - name: GatewayJwtFilter
+              args:
+                secret: ${JWT_SECRET}
 
         - id: microservice-analytics
           uri: http://localhost:8084
           predicates:
             - Path=/api/analytics/**
           filters:
-            - TokenRelay
+            - GatewayJwtFilter
 
         - id: microservice-notifications
           uri: http://localhost:8085
           predicates:
             - Path=/api/notifications/**
           filters:
-            - TokenRelay
+            - GatewayJwtFilter
 
         - id: microservice-presets
           uri: http://localhost:8086
           predicates:
             - Path=/api/presets/**
           filters:
-            - TokenRelay
+            - GatewayJwtFilter
 
         - id: microservice-visual-content
           uri: http://localhost:8087
           predicates:
             - Path=/api/visual/**
           filters:
-            - TokenRelay
+            - GatewayJwtFilter
 
         - id: microservice-weather
           uri: http://localhost:8088
           predicates:
             - Path=/api/weather/**
           filters:
-            - TokenRelay
+            - GatewayJwtFilter
+
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin, RETAIN_UNIQUE
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            exposedHeaders:
+              - Authorization
+              - X-User-Email
+              #- X-User-Roles
+
+jwt:
+  secret: ${JWT_SECRET}
+
+logging:
+  level:
+    ru.pin36bik: DEBUG  # Для вашего фильтра
+    org.springframework.cloud.gateway: TRACE # Для детальных логов Gateway

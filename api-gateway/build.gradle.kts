@@ -19,14 +19,19 @@ java {
 
 dependencies {
     implementation ("io.github.cdimascio:dotenv-java:3.0.0")
-    implementation("io.jsonwebtoken:jjwt-api:0.11.5")
     implementation("org.springframework.cloud:spring-cloud-starter-gateway")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+    implementation("io.jsonwebtoken:jjwt-api:0.12.3")
+    implementation("io.github.openfeign:feign-jackson:12.5")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
+
+    //implementation(project(":microservice-user-management"))
 
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 
-    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.3")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.3")
 
     compileOnly("org.projectlombok:lombok")
 

@@ -8,6 +8,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface WindowRepository extends JpaRepository<WindowUser, Long> {
-    List<WindowUser> findByUserId(Long userId);
+public interface WindowRepository extends JpaRepository<WindowUser, String> {
+    List<WindowUser> findByUserEmail(String userEmail);
 }
