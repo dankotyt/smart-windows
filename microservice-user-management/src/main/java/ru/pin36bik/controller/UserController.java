@@ -57,7 +57,4 @@ public class UserController {
         cookieService.expireAllCookies(response);
         return ResponseEntity.noContent().build();
     }
-
-    //=============================WINDOWS===========================
-
 }

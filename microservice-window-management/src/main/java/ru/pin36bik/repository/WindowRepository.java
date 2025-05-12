@@ -9,5 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface WindowRepository extends JpaRepository<WindowUser, String> {
-    List<WindowUser> findByUserEmail(String userEmail);
+    List<WindowUser> findWindowsByUserEmail(String userEmail);
+    Optional<WindowUser> findByUserEmail(String userEmail);
+    Optional<WindowUser> findByWindowId(Long windowId);
 }
