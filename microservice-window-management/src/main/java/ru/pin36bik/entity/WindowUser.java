@@ -28,4 +28,13 @@ public class WindowUser {
 
     @Column(name = "presets")
     private String presets;
+
+    @Column(name = "city_name")
+    private String cityName;
+
+    @Column(name = "latitude")
+    private Double latitude;
+
+    @Column(name = "longitude")
+    private Double longitude;
 }

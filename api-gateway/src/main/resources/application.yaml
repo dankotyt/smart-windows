@@ -11,7 +11,7 @@ spring:
         - id: microservice-user-management
           uri: http://localhost:8082
           predicates:
-            - Path=/api/user/**
+            - Path=/api/v1/user/**
           filters:
             - GatewayJwtFilter
 
@@ -23,7 +23,7 @@ spring:
         - id: microservice-window-management
           uri: http://localhost:8083
           predicates:
-            - Path=/api/windows/**
+            - Path=/api/v1/windows/**
           filters:
             - name: GatewayJwtFilter
               args:
@@ -32,35 +32,35 @@ spring:
         - id: microservice-analytics
           uri: http://localhost:8084
           predicates:
-            - Path=/api/analytics/**
+            - Path=/api/v1/analytics/**
           filters:
             - GatewayJwtFilter
 
         - id: microservice-notifications
           uri: http://localhost:8085
           predicates:
-            - Path=/api/notifications/**
+            - Path=/api/v1/notifications/**
           filters:
             - GatewayJwtFilter
 
         - id: microservice-presets
           uri: http://localhost:8086
           predicates:
-            - Path=/api/presets/**
+            - Path=/api/v1/presets/**
           filters:
             - GatewayJwtFilter
 
         - id: microservice-visual-content
           uri: http://localhost:8087
           predicates:
-            - Path=/api/visual/**
+            - Path=/api/v1/visual/**
           filters:
             - GatewayJwtFilter
 
         - id: microservice-weather
           uri: http://localhost:8088
           predicates:
-            - Path=/api/weather/**
+            - Path=/api/v1/weather/**
           filters:
             - GatewayJwtFilter
 

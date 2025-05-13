@@ -18,7 +18,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/windows/**")
+                        .requestMatchers("/api/v1/windows/**")
                         .access((authentication, context) -> {
                             String validToken = context.getRequest().getHeader("X-Valid-Token");
                             return new AuthorizationDecision("true".equals(validToken));

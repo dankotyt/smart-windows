@@ -22,7 +22,10 @@ public class WindowMapper {
                 windowUser.getUserEmail(),
                 windowUser.getName(),
                 windowUser.isStatus(),
-                windowUser.getPresets()
+                windowUser.getPresets(),
+                windowUser.getCityName(),
+                windowUser.getLatitude(),
+                windowUser.getLongitude()
         );
     }
 }

@@ -13,7 +13,7 @@ import ru.pin36bik.service.WindowService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/windows")
+@RequestMapping("/api/v1/windows")
 @RequiredArgsConstructor
 @Slf4j
 public class WindowController {

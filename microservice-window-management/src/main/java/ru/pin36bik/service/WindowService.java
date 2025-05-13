@@ -40,6 +40,9 @@ public class WindowService {
         windowUser.setUserEmail(userEmail);
         windowUser.setName(request.getName());
         windowUser.setStatus(true);
+        windowUser.setLatitude(55.9825);
+        windowUser.setLongitude(37.1814);
+        windowUser.setCityName("Zelenograd");
 
         WindowUser saved = windowRepository.save(windowUser);
         return windowMapper.toResponse(saved);
@@ -69,4 +72,8 @@ public class WindowService {
 
         windowRepository.delete(windowUser);
     }
+
+//    public WindowResponse getLocation(Long windowId, ) {
+//
+//    }
 }

@@ -59,7 +59,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/validate").permitAll()
                         .requestMatchers("/api/v1/auth/refresh").authenticated()
                         .requestMatchers("/api/v1/auth/logout").authenticated()
-                        .requestMatchers("/api/user/**").authenticated()
+                        .requestMatchers("/api/v1/user/**").authenticated()
                         //.requestMatchers("/api/windows/**").authenticated()// Удалить в production
                         .anyRequest().authenticated()
                 )

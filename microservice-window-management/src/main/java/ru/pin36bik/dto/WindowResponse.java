@@ -13,5 +13,8 @@ public class WindowResponse {
     private String name;
     private boolean status;
     private String presets;
+    private String cityName;
+    private Double latitude;
+    private Double longitude;
 }
 
