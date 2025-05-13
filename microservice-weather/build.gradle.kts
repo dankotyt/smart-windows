@@ -1,5 +1,8 @@
+//добавить это, чтобы не было ошибки "<название библиотеки> add to classpath"
 plugins {
-    id("java")
+    java
+    id("org.springframework.boot") version "3.2.0"
+    id("io.spring.dependency-management") version "1.1.7"
 }
 
 group = "ru.pin36bik"
@@ -9,10 +12,6 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
-}
-
-repositories {
-    mavenCentral()
 }
 
 dependencies {

@@ -27,13 +27,12 @@ public class WindowService {
                 .toList();
     }
 
-    //пофиксить (exception не тот + не работает)
     public WindowResponse addWindow(WindowRequest request, String userEmail) {
 
-        windowRepository.findByWindowId(request.getWindowId())
-                .ifPresent(w -> {
-                    throw new NonUniqueWindowException("Окно с таким ID уже есть в базе!");
-                });
+        if (windowRepository.existsByUserEmailAndWindowId(userEmail, request.getWindowId())) {
+            throw new NonUniqueWindowException("Окно с ID " + request.getWindowId() +
+                    " уже существует у пользователя " + userEmail);
+        }
 
         WindowUser windowUser = new WindowUser();
         windowUser.setWindowId(request.getWindowId());
@@ -48,7 +47,6 @@ public class WindowService {
         return windowMapper.toResponse(saved);
     }
 
-    //пофиксить (exception не тот)
     public WindowResponse updateWindow(WindowRequest request, String userEmail, Long windowId) {
         WindowUser windowUser = windowRepository.findByWindowId(windowId)
                 .orElseThrow(() -> new InvalidWindowIdException("Окно с ID " + windowId + " не найдено"));
@@ -73,7 +71,10 @@ public class WindowService {
         windowRepository.delete(windowUser);
     }
 
-//    public WindowResponse getLocation(Long windowId, ) {
+//    public WindowResponse getLocation(Long windowId) {
+//        WindowUser windowUser = windowRepository.findByWindowId(windowId)
+//                .orElseThrow(() -> new InvalidWindowIdException("Окно с ID " + windowId + " не найдено"));
+//
 //
 //    }
 }
