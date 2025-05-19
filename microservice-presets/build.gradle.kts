@@ -33,4 +33,6 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    systemProperty("file.encoding", "UTF-8")
+    systemProperty("sun.jnu.encoding", "UTF-8")
 }
