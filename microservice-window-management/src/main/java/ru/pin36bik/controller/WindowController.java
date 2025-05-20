@@ -2,9 +2,7 @@ package ru.pin36bik.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ru.pin36bik.dto.WindowRequest;
-import ru.pin36bik.dto.WindowResponse;
-import ru.pin36bik.dto.WindowUserDTO;
+import ru.pin36bik.dto.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.pin36bik.exceptions.InvalidTokenException;
@@ -35,7 +33,7 @@ public class WindowController {
 
     @PatchMapping("/update/{windowId}")
     public ResponseEntity<WindowResponse> updateWindow(
-            @RequestBody WindowRequest request,
+            @RequestBody WindowRequestForUpdate request,
             @PathVariable Long windowId,
             @RequestHeader("X-User-Email") String userEmail,
             @RequestHeader("X-Valid-Token") String validToken) {
@@ -66,5 +64,17 @@ public class WindowController {
         }
         windowService.deleteWindow(windowId, userEmail);
         return ResponseEntity.noContent().build();
+    }
+
+    //================WEATHER==================
+    @GetMapping("/location/{windowId}")
+    public ResponseEntity<WindowLocationDTO> getWindowLocation(
+            @PathVariable Long windowId,
+            @RequestHeader("X-User-Email") String userEmail,
+            @RequestHeader("X-Valid-Token") String validToken) {
+        if (!"true".equals(validToken)) {
+            throw new InvalidTokenException("Token validation failed");
+        }
+        return ResponseEntity.ok(windowService.getLocation(windowId, userEmail));
     }
 }

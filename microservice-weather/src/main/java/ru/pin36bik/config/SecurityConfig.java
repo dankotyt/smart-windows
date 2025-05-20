@@ -19,10 +19,15 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/windows/**")
+                        .requestMatchers("/api/v1/weather/**")
                         .access((authentication, context) -> {
                             String validToken = context.getRequest().getHeader("X-Valid-Token");
-                            return new AuthorizationDecision("true".equals(validToken));
+                            String weatherKey = context.getRequest().getHeader("X-Yandex-Weather-Key");
+                            return new AuthorizationDecision(
+                                    "true".equals(validToken) &&
+                                            weatherKey != null &&
+                                            !weatherKey.isEmpty()
+                            );
                         })
                         .anyRequest().denyAll()
                 );

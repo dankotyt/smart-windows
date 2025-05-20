@@ -1,14 +1,21 @@
 package ru.pin36bik.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import ru.pin36bik.dto.WindowLocationDTO;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
-@Entity
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Entity
+@Table(name = "weather")
 public class Weather {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,18 +24,45 @@ public class Weather {
     @Column(name = "window_id")
     private Long windowId;
 
-    // Текущая погода
-    private Double temperature;
-    private String weatherText;
-    private Boolean hasPrecipitation;
-    private String precipitationType;
-    private Double windSpeed;
-    private Integer humidity; //влажность
+    @Column(name = "user_email")
+    private String userEmail;
 
-    // Прогноз на ближайшее время
-    private LocalDateTime forecastTime;
-    private Double forecastTemperature;
-    private String forecastCondition;
+    @Embedded
+    private WindowLocationDTO location;
 
+    @Column(name = "temp")
+    private Integer temperature;
+
+    @Column(name = "humidity")
+    private Integer humidity;
+
+    @Column(name = "pressure")
+    private Integer pressure;
+
+    @Column(name = "prec_type")
+    private String precType;
+
+    @Column(name = "prec_strength")
+    private String precStrength;
+
+    @Column(name = "wind_direction")
+    private String windDirection;
+
+    @Column(name = "wind_speed")
+    private Float windSpeed;
+
+    @Column(name = "condition")
+    private String condition;
+
+    @Column(name = "cloudiness")
+    private String cloudiness;
+
+    @Column(name = "date")
+    private LocalDate date;
+
+    @OneToMany(mappedBy = "weather", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WeatherForecast> forecasts = new ArrayList<>();
+
+    @Column(name = "last_updated")
     private LocalDateTime lastUpdated;
 }

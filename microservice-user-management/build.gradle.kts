@@ -32,7 +32,6 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("org.springframework.kafka:spring-kafka")
     implementation("io.jsonwebtoken:jjwt-api:0.12.3")
-    implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
 
     implementation(project(":microservice-presets"))
 

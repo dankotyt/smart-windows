@@ -1,6 +1,7 @@
 package ru.pin36bik.utils;
 
 import org.springframework.stereotype.Component;
+import ru.pin36bik.dto.WindowLocationDTO;
 import ru.pin36bik.dto.WindowResponse;
 import ru.pin36bik.dto.WindowUserDTO;
 import ru.pin36bik.entity.WindowUser;
@@ -13,6 +14,7 @@ public class WindowMapper {
         windowDTO.setUserEmail(windowUser.getUserEmail());
         windowDTO.setName(windowUser.getName());
         windowDTO.setPresets(windowUser.getPresets());
+        windowDTO.setLocation(toLocationDTO(windowUser));
         return windowDTO;
     }
 
@@ -23,9 +25,17 @@ public class WindowMapper {
                 windowUser.getName(),
                 windowUser.isStatus(),
                 windowUser.getPresets(),
-                windowUser.getCityName(),
-                windowUser.getLatitude(),
-                windowUser.getLongitude()
+                windowUser.getLocation().getCityName(),
+                windowUser.getLocation().getLatitude(),
+                windowUser.getLocation().getLongitude()
+        );
+    }
+
+    public WindowLocationDTO toLocationDTO(WindowUser windowUser) {
+        return new WindowLocationDTO(
+                windowUser.getLocation().getCityName(),
+                windowUser.getLocation().getLatitude(),
+                windowUser.getLocation().getLongitude()
         );
     }
 }

@@ -1,22 +1,23 @@
 package ru.pin36bik.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class WeatherDTO {
     private Long windowId;
-    private Double temperature;
-    private String weatherText;
-    private Boolean hasPrecipitation;
-    private String precipitationType;
-    private Double windSpeed;
-    private Integer humidity;
-    private LocalDateTime forecastTime;
-    private Double forecastTemperature;
-    private String forecastCondition;
+    private String userEmail;
+    private WindowLocationDTO location;
+
+    private WeatherCurrentDTO current;
+
+    private List<WeatherForecastDTO> forecasts;
+
     private LocalDateTime lastUpdated;
 }

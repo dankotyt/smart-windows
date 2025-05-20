@@ -23,6 +23,11 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-bootstrap")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation ("io.github.cdimascio:dotenv-java:3.0.0")
+    implementation("org.springframework.kafka:spring-kafka")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.postgresql:postgresql")
+    implementation("com.fasterxml.jackson.core:jackson-databind")
 
     compileOnly("org.projectlombok:lombok")
 

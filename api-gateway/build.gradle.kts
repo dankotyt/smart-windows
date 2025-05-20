@@ -25,8 +25,6 @@ dependencies {
     implementation("io.github.openfeign:feign-jackson:12.5")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
 
-    //implementation(project(":microservice-user-management"))
-
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 

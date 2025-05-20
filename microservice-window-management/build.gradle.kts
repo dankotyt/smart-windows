@@ -24,8 +24,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation ("io.github.cdimascio:dotenv-java:3.0.0")
     implementation("org.postgresql:postgresql")
-    implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
-    implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation("org.springframework.kafka:spring-kafka")
+    implementation("com.fasterxml.jackson.core:jackson-databind")
 
     compileOnly("org.projectlombok:lombok")
 

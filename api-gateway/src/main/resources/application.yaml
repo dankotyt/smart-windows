@@ -62,7 +62,10 @@ spring:
           predicates:
             - Path=/api/v1/weather/**
           filters:
-            - GatewayJwtFilter
+            - AddRequestHeader=X-Yandex-Weather-Key, ${YWAPI_KEY}
+            - name: GatewayJwtFilter
+              args:
+                secret: ${JWT_SECRET}
 
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin, RETAIN_UNIQUE
@@ -75,12 +78,17 @@ spring:
             exposedHeaders:
               - Authorization
               - X-User-Email
+              - X-Yandex-Weather-Key
               #- X-User-Roles
 
 jwt:
   secret: ${JWT_SECRET}
+YWAPI_KEY: ${YWAPI_KEY}
 
 logging:
   level:
     ru.pin36bik: DEBUG  # Для вашего фильтра
     org.springframework.cloud.gateway: TRACE # Для детальных логов Gateway
+
+server:
+  port: 8080

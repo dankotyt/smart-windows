@@ -1,5 +1,6 @@
 package ru.pin36bik.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
@@ -13,4 +14,5 @@ public class WindowUserDTO {
     private String name;
     private boolean status;
     private String presets;
+    private WindowLocationDTO location;
 }

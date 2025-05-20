@@ -36,3 +36,6 @@ springdoc:
   api-docs:
     path: /api-docs
   show-actuator: true
+
+server:
+  port: 8086
