@@ -8,10 +8,6 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-  redis:
-    host: localhost
-    port: 6379
-    database: 0
   cache:
     type: redis
     redis:
@@ -26,6 +22,11 @@ spring:
     producer:
       key-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+  data:
+    redis:
+      host: localhost
+      database: 0
+      port: 6379
 
 springdoc:
   swagger-ui:
@@ -35,3 +36,6 @@ springdoc:
   api-docs:
     path: /api-docs
   show-actuator: true
+
+server:
+  port: 8086

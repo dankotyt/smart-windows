@@ -1,0 +1,94 @@
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+  main:
+    web-application-type: reactive
+  cloud:
+    gateway:
+      routes:
+        - id: microservice-user-management
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/v1/user/**
+          filters:
+            - GatewayJwtFilter
+
+        - id: microservice-user-management
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/v1/auth/**
+
+        - id: microservice-window-management
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/v1/windows/**
+          filters:
+            - name: GatewayJwtFilter
+              args:
+                secret: ${JWT_SECRET}
+
+        - id: microservice-analytics
+          uri: http://localhost:8084
+          predicates:
+            - Path=/api/v1/analytics/**
+          filters:
+            - GatewayJwtFilter
+
+        - id: microservice-notifications
+          uri: http://localhost:8085
+          predicates:
+            - Path=/api/v1/notifications/**
+          filters:
+            - GatewayJwtFilter
+
+        - id: microservice-presets
+          uri: http://localhost:8086
+          predicates:
+            - Path=/api/v1/presets/**
+          filters:
+            - GatewayJwtFilter
+
+        - id: microservice-visual-content
+          uri: http://localhost:8087
+          predicates:
+            - Path=/api/v1/visual/**
+          filters:
+            - GatewayJwtFilter
+
+        - id: microservice-weather
+          uri: http://localhost:8088
+          predicates:
+            - Path=/api/v1/weather/**
+          filters:
+            - AddRequestHeader=X-Yandex-Weather-Key, ${YWAPI_KEY}
+            - name: GatewayJwtFilter
+              args:
+                secret: ${JWT_SECRET}
+
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin, RETAIN_UNIQUE
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            exposedHeaders:
+              - Authorization
+              - X-User-Email
+              - X-Yandex-Weather-Key
+              #- X-User-Roles
+
+jwt:
+  secret: ${JWT_SECRET}
+YWAPI_KEY: ${YWAPI_KEY}
+
+logging:
+  level:
+    ru.pin36bik: DEBUG  # Для вашего фильтра
+    org.springframework.cloud.gateway: TRACE # Для детальных логов Gateway
+
+server:
+  port: 8080

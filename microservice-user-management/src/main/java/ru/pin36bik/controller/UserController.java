@@ -1,83 +1,60 @@
 package ru.pin36bik.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import ru.pin36bik.dto.UserDTO;
-import ru.pin36bik.dto.UserLoginDTO;
-import ru.pin36bik.dto.UserRegistrationDTO;
+import ru.pin36bik.dto.UserDTOForAdmin;
 import ru.pin36bik.entity.User;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import ru.pin36bik.service.CookieService;
 import ru.pin36bik.service.UserService;
-import ru.pin36bik.service.KafkaProducerService;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/v1/user")
+@RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-    private final KafkaProducerService kafkaProducerService;
+    private final CookieService cookieService;
 
-    @Autowired
-    public UserController(UserService userService, KafkaProducerService kafkaProducerService) {
-        this.userService = userService;
-        this.kafkaProducerService = kafkaProducerService;
+    @GetMapping("/admin/get_users")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<List<UserDTOForAdmin>> getAllUsersByAdmin() {
+        return ResponseEntity.ok(userService.getAllUsersDTOs());
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<UserDTO> registerUser(@RequestBody UserRegistrationDTO registrationDTO) {
-        return new ResponseEntity<>(userService.registerUser(registrationDTO), HttpStatus.OK);
+    @GetMapping("/admin/get_by_id/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getUserById(id));
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<UserDTO> loginUser(@RequestBody UserLoginDTO userLoginDTO) {
-        UserDTO userDTO = userService.authorizeUser(userLoginDTO);
-        return new ResponseEntity<>(userDTO, HttpStatus.OK);
-    }
-
-    @GetMapping("/get_users")
-    public ResponseEntity<List<User>> getUsers() {
-        return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
-    }
-
-    @GetMapping("/get_user_by_id")
-    public ResponseEntity<User> getUserById(@RequestParam("id") Long id) {
-        return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
-    }
-
-    @GetMapping("/get_user_by_email")
-    public ResponseEntity<User> getUserByEmail(@RequestParam("email") String email) {
-        return new ResponseEntity<>(userService.getUserByEmail(email), HttpStatus.OK);
-    }
-
-    @GetMapping("/get-preset/{presetName}")
-    public void getPresetByName(@PathVariable String presetName) {
-        kafkaProducerService.sendPresetRequest(presetName);
+    @GetMapping("/admin/get_by_email/{email}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
+        return ResponseEntity.ok(userService.getUserByEmail(email));
     }
 
     @PutMapping("/update")
-    public ResponseEntity<UserDTO> updateCurrentUser(@AuthenticationPrincipal UserDetails userDetails,
+    @PreAuthorize("isAuthenticated()") //"#userDTO.email == authentication.name or hasAuthority('ROLE_ADMIN')"
+    public ResponseEntity<UserDTO> updateCurrentUser(
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody UserDTO userDTO) {
-        UserDTO updatedUser = userService.updateCurrentUser(userDetails.getUsername(), userDTO);
-        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+        return ResponseEntity.ok(userService.updateCurrentUser(userDetails.getUsername(), userDTO));
     }
 
     @DeleteMapping("/delete")
+    @PreAuthorize("#email == authentication.name or hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Void> deleteAndArchiveCurrentUser(
-            @AuthenticationPrincipal UserDetails userDetails) {
-        String email = userDetails.getUsername();
+            @RequestParam String email,
+            HttpServletResponse response) {
         userService.deleteAndArchiveUser(email);
-        return new ResponseEntity<>(HttpStatus.OK);
+        cookieService.expireAllCookies(response);
+        return ResponseEntity.noContent().build();
     }
-
-    //Возможно, понадобиться при тестах
-//    @DeleteMapping("/{email}")
-//    public HttpStatus deleteCurrentUser(@PathVariable("id") String email) {
-//        userService.deleteUser(email);
-//        return HttpStatus.OK;
-//    }
-
 }

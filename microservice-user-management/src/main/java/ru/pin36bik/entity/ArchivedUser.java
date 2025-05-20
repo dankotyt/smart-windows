@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,13 +15,13 @@ import java.time.LocalDateTime;
 @Table(name = "archived_users")
 public class ArchivedUser {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Column(nullable = false)
     private String name;
 
-    private String lastName;
+    private String surname;
 
     @Column(nullable = false)
     private LocalDate birthday;
@@ -31,6 +32,6 @@ public class ArchivedUser {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(nullable = false, updatable = false)
+    @CreationTimestamp
     private LocalDateTime deletedAt;
 }
