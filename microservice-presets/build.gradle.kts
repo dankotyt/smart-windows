@@ -35,6 +35,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
     implementation("com.fasterxml.jackson.core:jackson-databind")
+    testImplementation("com.h2database:h2")
 }
 
 tasks.test {
