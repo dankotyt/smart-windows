@@ -1,3 +1,8 @@
+repositories {
+	gradlePluginPortal()
+	mavenCentral()
+}
+
 plugins {
 	java
 	id("org.springframework.boot") version "3.4.3"
@@ -17,10 +22,6 @@ configurations {
 	compileOnly {
 		extendsFrom(configurations.annotationProcessor.get())
 	}
-}
-
-repositories {
-	mavenCentral()
 }
 
 dependencies {
