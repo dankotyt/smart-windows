@@ -9,6 +9,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import ru.pin36bik.dto.PresetDTO;
 import ru.pin36bik.entity.Preset;
+import ru.pin36bik.exceptions.PresetNotFoundException;
 import ru.pin36bik.repository.PresetRepository;
 
 @Service
@@ -31,8 +32,8 @@ public class PresetService {
     public PresetDTO getPresetById(final Long id) {
         Preset preset = presetRepos.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "Пресет не найден по идентификатору: " + id));
+                        new PresetNotFoundException(
+                                "Пресет не найден по идентификатору:" + id));
         kafkaTemplate.send("preset-download-topic", preset.getPresetName());
         System.out.println("Sent preset name " + preset.getPresetName());
         return modelMapper.map(preset, PresetDTO.class);
@@ -49,8 +50,9 @@ public class PresetService {
     public PresetDTO updatePreset(
             final PresetDTO presetDTO) {
         Preset preset = presetRepos.findById(presetDTO.getId())
-                .orElseThrow(() -> new RuntimeException(
-                        "Preset not found with id: " + presetDTO.getId()));
+                .orElseThrow(() -> new PresetNotFoundException(
+                        "Пресет не найден по идентификатору: "
+                                + presetDTO.getId()));
         modelMapper.map(presetDTO, preset);
         Preset updatedPreset = presetRepos.save(preset);
         return modelMapper.map(updatedPreset, PresetDTO.class);
@@ -58,6 +60,10 @@ public class PresetService {
 
     @CacheEvict(value = "presets", key = "#id")
     public void deletePreset(final Long id) {
+        if (!presetRepos.existsById(id)) {
+            throw new PresetNotFoundException(
+                    "Пресет не найден по идентификатору: " + id);
+        }
         presetRepos.deleteById(id);
     }
 }

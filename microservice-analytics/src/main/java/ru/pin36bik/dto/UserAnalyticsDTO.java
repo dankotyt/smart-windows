@@ -4,13 +4,20 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@EqualsAndHashCode
 @Schema(description = "Данные о пользователе")
 public class UserAnalyticsDTO {
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.
+            ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+
     @Schema(description = "Уникальный идентификатор пользователя",
             example = "456")
     @JsonProperty("user_id")
@@ -44,5 +51,17 @@ public class UserAnalyticsDTO {
         this.loginCount = myLoginCount;
         this.lastLogin = myLastLogin;
         this.timestamp = myTimestamp;
+    }
+
+    @Override
+    public String toString() {
+        return "UserAnalyticsDTO("
+                + "userId=" + userId
+                + ", loginCount=" + loginCount
+                + ", lastLogin=" + (lastLogin != null ? lastLogin
+                .format(FORMATTER) : null)
+                + ", timestamp=" + (timestamp != null ? timestamp
+                .format(FORMATTER) : null)
+                + ')';
     }
 }

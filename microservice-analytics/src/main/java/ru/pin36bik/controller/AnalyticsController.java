@@ -46,10 +46,15 @@ public class AnalyticsController {
             @ApiResponse(responseCode = "400",
                     description = "Некорректные данные пресета")
     })
-    public ResponseEntity<PresetAnalyticsDTO> createPreset(
+    public ResponseEntity<?> createPreset(
             @Parameter(description = "Данные пресета в формате JSON",
                     required = true)
             @Valid @RequestBody final PresetAnalyticsDTO preset_analytics_DTO) {
+        if (preset_analytics_DTO.getPresetName() == null
+                || preset_analytics_DTO.getPresetName().isEmpty()) {
+            return ResponseEntity.badRequest().body(
+                    "Preset name cannot be empty");
+        }
         return ResponseEntity.ok(
                 analyticsService.savePresetAnalytics(preset_analytics_DTO));
     }
@@ -63,12 +68,14 @@ public class AnalyticsController {
             @ApiResponse(responseCode = "404",
                     description = "Пресет не найден")
     })
-    public ResponseEntity<Optional<PresetAnalyticsDTO>> getPresetByName(
+    public ResponseEntity<PresetAnalyticsDTO> getPresetByName(
             @Parameter(description = "Название пресета",
                     required = true, example = "Test_Preset")
             @PathVariable final String preset_name) {
-        return ResponseEntity.ok(
-                analyticsService.getPresetAnalytics(preset_name));
+        Optional<PresetAnalyticsDTO> preset = analyticsService.
+                getPresetAnalytics(preset_name);
+        return preset.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping(value = "/presets/downloads",
@@ -154,11 +161,14 @@ public class AnalyticsController {
             @ApiResponse(responseCode = "404",
                     description = "Пользователь не найден")
     })
-    public ResponseEntity<Optional<UserAnalyticsDTO>> getUserById(
+    public ResponseEntity<UserAnalyticsDTO> getUserById(
             @Parameter(description = "Идентификатор пользователя",
                     required = true, example = "12345")
             @PathVariable final Long user_id) {
-        return ResponseEntity.ok(analyticsService.getUserAnalytics(user_id));
+        Optional<UserAnalyticsDTO> user = analyticsService.
+                getUserAnalytics(user_id);
+        return user.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/users/earliest-login")

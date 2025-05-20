@@ -6,18 +6,26 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.pin36bik.dto.PresetDTO;
+import ru.pin36bik.exceptions.PresetNotFoundException;
 import ru.pin36bik.service.PresetService;
 
 @RestController
@@ -48,27 +56,32 @@ public class PresetController {
                     description = "Пресет не найден")
     })
     @GetMapping("/get-by-id/{id}")
-    public PresetDTO getPresetById(
+    public ResponseEntity<PresetDTO> getPresetById(
             @Parameter(description = "ID пресета",
                     required = true, example = "1")
             @PathVariable final Long id) {
-        return presetService.getPresetById(id);
+        try {
+            PresetDTO presetDTO = presetService.getPresetById(id);
+            return ResponseEntity.ok(presetDTO);
+        } catch (PresetNotFoundException ex) {
+            throw ex;
+        }
     }
 
     @Operation(summary = "Создать новый пресет",
             description = "Создает и возвращает новый пресет")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",
+            @ApiResponse(responseCode = "201",
                     description = "Пресет успешно создан"),
             @ApiResponse(responseCode = "400",
                     description = "Некорректные данные")
     })
     @PostMapping("/create")
-    public PresetDTO createPreset(
+    public ResponseEntity<PresetDTO> createPreset(
             @Parameter(description = "Данные пресета в формате JSON",
                     required = true)
             @Valid @RequestBody final PresetDTO preset_DTO) {
-        return presetService.createPreset(preset_DTO);
+        return ResponseEntity.ok(presetService.createPreset(preset_DTO));
     }
 
     @Operation(summary = "Обновить пресет",
@@ -76,13 +89,13 @@ public class PresetController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
                     description = "Пресет успешно обновлен"),
-            @ApiResponse(responseCode = "400",
-                    description = "Некорректные данные"),
             @ApiResponse(responseCode = "404",
-                    description = "Пресет не найден")
+                    description = "Пресет не найден"),
+            @ApiResponse(responseCode = "400",
+                    description = "Некорректные данные")
     })
     @PutMapping("/update-by-id/{id}")
-    public PresetDTO updatePresetById(
+    public ResponseEntity<PresetDTO> updatePresetById(
             @Parameter(description = "ID пресета",
                     required = true,
                     example = "1")
@@ -90,7 +103,7 @@ public class PresetController {
             @Parameter(description = "Обновленные данные пресета",
                     required = true)
             @Valid @RequestBody final PresetDTO preset_DTO) {
-        return presetService.updatePreset(preset_DTO);
+        return ResponseEntity.ok(presetService.updatePreset(preset_DTO));
     }
 
     @Operation(summary = "Удалить пресет",
@@ -102,11 +115,33 @@ public class PresetController {
                     description = "Пресет не найден")
     })
     @DeleteMapping("/delete-by-id/{id}")
-    public void deletePresetById(
+    public ResponseEntity<Void> deletePresetById(
             @Parameter(description = "ID пресета",
                     required = true,
                     example = "1")
             @PathVariable final Long id) {
         presetService.deletePreset(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler(PresetNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handlePresetNotFound(
+            final PresetNotFoundException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", "NOT_FOUND");
+        errorResponse.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(
+            final MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach(error -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return ResponseEntity.badRequest().body(errors);
     }
 }

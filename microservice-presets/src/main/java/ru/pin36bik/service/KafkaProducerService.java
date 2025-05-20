@@ -17,6 +17,10 @@ public class KafkaProducerService {
     }
 
     public void sendPresetResponse(final PresetDTO presetDTO) {
-        kafkaTemplate.send("preset-response-topic", presetDTO);
+        try {
+            kafkaTemplate.send("preset-response-topic", presetDTO);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to send preset to Kafka", e);
+        }
     }
 }

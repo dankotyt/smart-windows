@@ -4,11 +4,16 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
+
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@EqualsAndHashCode
+@ToString
 @Schema(description = "Данные о пресете настроек окна, "
         + "доступном для загрузки")
 public class PresetAnalyticsDTO {
