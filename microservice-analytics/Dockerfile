@@ -1,4 +1,4 @@
-FROM amazoncorretto:21 as builder
+FROM amazoncorretto:21 AS builder
 
 WORKDIR /app
 
@@ -7,15 +7,19 @@ COPY gradle ./gradle
 COPY microservice-analytics/build.gradle.kts ./microservice-analytics/
 COPY microservice-analytics/src ./microservice-analytics/src
 
-RUN ./gradlew :microservice-analytics:bootJar --no-daemon
+RUN ./gradlew :microservice-analytics:bootJar --no-daemon --info
 
-FROM amazoncorretto:21-jre
+FROM amazoncorretto:21
 
 WORKDIR /app
 
 COPY --from=builder /app/microservice-analytics/build/libs/*.jar app.jar
 
-RUN addgroup --system spring && adduser --system --ingroup spring spring
+RUN yum install -y shadow-utils && \
+    groupadd --system spring && \
+    useradd --system --gid spring spring && \
+    yum clean all
+
 USER spring:spring
 
 EXPOSE 8080
