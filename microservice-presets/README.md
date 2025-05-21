@@ -64,7 +64,7 @@ BD_PASSWORD=your_db_password
 
 ## 6. API документация:
 
-При запущенном PresetsApplication доступна по адресу: http://localhost:8080/swagger-ui.html
+При запущенном PresetsApplication доступна по адресу: http://localhost:8086/swagger-ui.html
 
 В остальных случаях:
 
