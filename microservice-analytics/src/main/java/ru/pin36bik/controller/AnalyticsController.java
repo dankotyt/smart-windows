@@ -49,17 +49,17 @@ public class AnalyticsController {
     public ResponseEntity<?> createPreset(
             @Parameter(description = "Данные пресета в формате JSON",
                     required = true)
-            @Valid @RequestBody final PresetAnalyticsDTO preset_analytics_DTO) {
-        if (preset_analytics_DTO.getPresetName() == null
-                || preset_analytics_DTO.getPresetName().isEmpty()) {
+            @Valid @RequestBody final PresetAnalyticsDTO presetAnalyticsDTO) {
+        if (presetAnalyticsDTO.getPresetName() == null
+                || presetAnalyticsDTO.getPresetName().isEmpty()) {
             return ResponseEntity.badRequest().body(
                     "Preset name cannot be empty");
         }
         return ResponseEntity.ok(
-                analyticsService.savePresetAnalytics(preset_analytics_DTO));
+                analyticsService.savePresetAnalytics(presetAnalyticsDTO));
     }
 
-    @GetMapping("/presets/get-preset-by-name/{preset_name}")
+    @GetMapping("/presets/get-by-name/{preset-name}")
     @Operation(summary = "Найти пресет по его названию",
             description = "Возвращает пресет по указанному названию")
     @ApiResponses(value = {
@@ -70,10 +70,10 @@ public class AnalyticsController {
     })
     public ResponseEntity<PresetAnalyticsDTO> getPresetByName(
             @Parameter(description = "Название пресета",
-                    required = true, example = "Test_Preset")
-            @PathVariable final String preset_name) {
+                    required = true, example = "test-preset")
+            @PathVariable("preset-name") final String presetName) {
         Optional<PresetAnalyticsDTO> preset = analyticsService.
-                getPresetAnalytics(preset_name);
+                getPresetAnalytics(presetName);
         return preset.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -92,7 +92,7 @@ public class AnalyticsController {
     })
     public ResponseEntity<LocalDateTime> recordPresetDownload(
             @Parameter(description = "Название пресета в формате JSON",
-                    required = true)
+                    required = true, example = "test-preset")
             @Valid @RequestBody final String presetName) {
         return ResponseEntity.ok(
                 analyticsService.recordPresetDownload(presetName));
@@ -128,9 +128,9 @@ public class AnalyticsController {
     public ResponseEntity<UserAnalyticsDTO> createUser(
             @Parameter(description = "Данные пресета в формате JSON",
                     required = true)
-            @Valid @RequestBody final UserAnalyticsDTO user_analytics_DTO) {
+            @Valid @RequestBody final UserAnalyticsDTO userAnalyticsDTO) {
         return ResponseEntity.ok(analyticsService
-                .saveUserAnalytics(user_analytics_DTO));
+                .saveUserAnalytics(userAnalyticsDTO));
     }
 
     @PostMapping(value = "/users/logins",
@@ -147,12 +147,12 @@ public class AnalyticsController {
     })
     public ResponseEntity<LocalDateTime> recordUserLogin(
             @Parameter(description = "ID пользователя в формате JSON",
-                    required = true)
+                    required = true, example = "12345")
             @Valid @RequestBody final Long userId) {
         return ResponseEntity.ok(analyticsService.recordUserLogin(userId));
     }
 
-    @GetMapping("/users/get-user-by-id/{user_id}")
+    @GetMapping("/users/get-by-id/{user-id}")
     @Operation(summary = "Найти пользователя по его ID",
             description = "Возвращает запись о пользователе по указанному ID")
     @ApiResponses(value = {
@@ -164,9 +164,9 @@ public class AnalyticsController {
     public ResponseEntity<UserAnalyticsDTO> getUserById(
             @Parameter(description = "Идентификатор пользователя",
                     required = true, example = "12345")
-            @PathVariable final Long user_id) {
+            @PathVariable("user-id") final Long userId) {
         Optional<UserAnalyticsDTO> user = analyticsService.
-                getUserAnalytics(user_id);
+                getUserAnalytics(userId);
         return user.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
