@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.Optional;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,17 +25,14 @@ import ru.pin36bik.dto.UserAnalyticsDTO;
 import ru.pin36bik.service.AnalyticsService;
 
 @RestController
-@RequestMapping(value = "/api/v0/analytics",
+@RequiredArgsConstructor
+@RequestMapping(value = "/api/v1/analytics",
         produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Window Analytics API",
         description = "API для работы с данными об использовании умных окон")
 public class AnalyticsController {
 
     private final AnalyticsService analyticsService;
-
-    public AnalyticsController(final AnalyticsService myAnalyticsService) {
-        this.analyticsService = myAnalyticsService;
-    }
 
     @PostMapping(value = "/presets",
             consumes = MediaType.APPLICATION_JSON_VALUE)

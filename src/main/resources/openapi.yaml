@@ -20,7 +20,7 @@ tags:
     description: API для управления пресетами настроек окон
   - name: auth
     description: API для авторизации и аутентификации пользователей
-  - name: user
+  - name: users
     description: API для создания и редактирования профиля пользователя, как с ролью USER, так и с ролью ADMIN
   - name: weather
     description: API для получения данных о погоде
@@ -441,7 +441,7 @@ paths:
   /user/admin/get_users:
     get:
       tags:
-        - user
+        - users
       summary: Получить всех пользователей (админ)
       description: Возвращает список всех пользователей (только для админа)
       operationId: getAllUsersByAdmin
@@ -462,7 +462,7 @@ paths:
   /user/admin/get_by_id/{id}:
     get:
       tags:
-        - user
+        - users
       summary: Получить пользователя по ID (админ)
       description: Возвращает пользователя по ID (только для админа)
       operationId: getUserByIdAdmin
@@ -490,7 +490,7 @@ paths:
   /user/admin/get_by_email/{email}:
     get:
       tags:
-        - user
+        - users
       summary: Получить пользователя по email (админ)
       description: Возвращает полные данные пользователя по email (только для админа)
       operationId: getUserByEmailAdmin
@@ -527,7 +527,7 @@ paths:
   /user/update:
     put:
       tags:
-        - user
+        - users
       summary: Обновить данные пользователя
       description: Обновляет данные текущего пользователя
       operationId: updateCurrentUser
@@ -553,7 +553,7 @@ paths:
   /user/delete:
     delete:
       tags:
-        - user
+        - users
       summary: Удалить пользователя
       description: Удаляет и архивирует пользователя
       operationId: deleteAndArchiveCurrentUser

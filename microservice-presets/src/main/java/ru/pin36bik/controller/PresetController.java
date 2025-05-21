@@ -29,7 +29,7 @@ import ru.pin36bik.exceptions.PresetNotFoundException;
 import ru.pin36bik.service.PresetService;
 
 @RestController
-@RequestMapping(value = "/api/v0/presets",
+@RequestMapping(value = "/api/v1/presets",
         produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Preset API",

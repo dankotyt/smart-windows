@@ -3,10 +3,17 @@ spring:
     name: smart-windows
   kafka:
     bootstrap-servers: localhost:9092
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 
 server:
   port: 8079
 
 springdoc:
   swagger-ui:
-    url: classpath:/openapi.yaml
+    path: /swagger-ui.html
+    tagsSorter: alpha
+    operationsSorter: alpha
+  api-docs:
+    path: /api-docs
+  show-actuator: true

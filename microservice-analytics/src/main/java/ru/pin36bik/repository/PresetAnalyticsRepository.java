@@ -13,18 +13,19 @@ import ru.pin36bik.entity.PresetAnalytics;
 @Repository
 public interface PresetAnalyticsRepository
         extends JpaRepository<PresetAnalytics, String> {
+
     @Query("SELECT p FROM PresetAnalytics p "
-            + "WHERE LOWER(p.presetName) = LOWER(:preset_name)")
+            + "WHERE LOWER(p.presetName) = LOWER(:presetName)")
     List<PresetAnalytics> findByPresetName(
-            @Param("preset_name") String preset_name);
+            @Param("presetName") String presetName);
 
     @Query("SELECT p FROM PresetAnalytics p "
             + "ORDER BY p.downloadsNumber DESC LIMIT 1")
     Optional<PresetAnalytics> findTopByDownloadsNumber();
 
     @Modifying
-    @Query("UPDATE PresetAnalytics p SET p.downloadsNumber = "
-            + "p.downloadsNumber + 1"
+    @Query("UPDATE PresetAnalytics p SET p.downloadsNumber = p.downloadsNumber + 1, "
+            + "p.downloadsNumber = :now "
             + "WHERE p.presetName = :presetName")
     void incrementDownloadsNumber(@Param("presetName") String presetName,
                                   @Param("now") LocalDateTime now);
