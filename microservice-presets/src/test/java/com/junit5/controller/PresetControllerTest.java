@@ -50,7 +50,7 @@ class PresetControllerTest {
 
         when(presetService.getPresetById(1L)).thenReturn(mockPreset);
 
-        mockMvc.perform(get("/api/presets/v0/get-by-id/1")
+        mockMvc.perform(get("/api/v0/presets/get-by-id/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
@@ -63,7 +63,7 @@ class PresetControllerTest {
     void getPresetById_ShouldReturn404WhenNotFound() throws Exception {
         when(presetService.getPresetById(1L)).thenThrow(new PresetNotFoundException("Пресет не найден по идентификатору: 1"));
 
-        mockMvc.perform(get("/api/presets/v0/get-by-id/1")
+        mockMvc.perform(get("/api/v0/presets/get-by-id/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
@@ -89,7 +89,7 @@ class PresetControllerTest {
 
         when(presetService.createPreset(any(PresetDTO.class))).thenReturn(outputDto);
 
-        mockMvc.perform(post("/api/presets/v0/create")
+        mockMvc.perform(post("/api/v0/presets/create")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(inputDto)))
                 .andExpect(status().isOk())
@@ -107,7 +107,7 @@ class PresetControllerTest {
     void createPreset_ShouldReturn400ForInvalidInput() throws Exception {
         PresetDTO invalidDto = new PresetDTO();
 
-        mockMvc.perform(post("/api/presets/v0/create")
+        mockMvc.perform(post("/api/v0/presets/create")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidDto)))
                 .andExpect(status().isBadRequest());
@@ -125,7 +125,7 @@ class PresetControllerTest {
 
         when(presetService.updatePreset(any(PresetDTO.class))).thenReturn(inputDto);
 
-        mockMvc.perform(put("/api/presets/v0/update-by-id/1")
+        mockMvc.perform(put("/api/v0/presets/update-by-id/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(inputDto)))
                 .andExpect(status().isOk())
@@ -152,7 +152,7 @@ class PresetControllerTest {
         when(presetService.updatePreset(any(PresetDTO.class)))
                 .thenThrow(new PresetNotFoundException("Пресет не найден по идентификатору: 100"));
 
-        mockMvc.perform(put("/api/presets/v0/update-by-id/100")
+        mockMvc.perform(put("/api/v0/presets/update-by-id/100")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(inputDto)))
                 .andExpect(status().isNotFound());
@@ -164,7 +164,7 @@ class PresetControllerTest {
     void deletePresetById_ShouldReturn204() throws Exception {
         doNothing().when(presetService).deletePreset(1L);
 
-        mockMvc.perform(delete("/api/presets/v0/delete-by-id/1")
+        mockMvc.perform(delete("/api/v0/presets/delete-by-id/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
@@ -175,7 +175,7 @@ class PresetControllerTest {
     void deletePresetById_ShouldReturn404WhenNotFound() throws Exception {
         doThrow(new PresetNotFoundException("Пресет не найден по идентификатору: 100")).when(presetService).deletePreset(100L);
 
-        mockMvc.perform(delete("/api/presets/v0/delete-by-id/100")
+        mockMvc.perform(delete("/api/v0/presets/delete-by-id/100")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
