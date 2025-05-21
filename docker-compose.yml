@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # PostgreSQL 17.4
   postgres:
@@ -29,7 +27,7 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
-    command: redis-server --requirepass ${REDIS_PASSWORD}
+    command: redis-server
     volumes:
       - redis_data:/data
     healthcheck:
@@ -59,13 +57,13 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-    volumes:
-      - kafka_data:/var/lib/kafka/data
+      volumes:
+        - kafka_data:/var/lib/kafka/data
     healthcheck:
       test: ["CMD", "kafka-topics", "--bootstrap-server", "kafka:9092", "--list"]
       interval: 10s
@@ -94,21 +92,21 @@ services:
       kafka:
         condition: service_healthy
 
-  # Notifications Service
-  notifications-service:
-    build:
-      context: .
-      dockerfile: microservice-notifications/Dockerfile
-    container_name: notifications-service
-    ports:
-      - "8081:8081"
-    env_file:
-      - .env
-    environment:
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    depends_on:
-      kafka:
-        condition: service_healthy
+#  # Notifications Service
+#  notifications-service:
+#    build:
+#      context: .
+#      dockerfile: microservice-notifications/Dockerfile
+#    container_name: notifications-service
+#    ports:
+#      - "8081:8081"
+#    env_file:
+#      - .env
+#    environment:
+#      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+#    depends_on:
+#      kafka:
+#        condition: service_healthy
 
   # Presets Service
   presets-service:
@@ -157,17 +155,17 @@ services:
       postgres:
         condition: service_healthy
 
-  # Visual Content Service
-  visual-content-service:
-    build:
-      context: .
-      dockerfile: microservice-visual-content/Dockerfile
-    container_name: visual-content-service
-    ports:
-      - "8084:8084"
-    depends_on:
-      postgres:
-        condition: service_healthy
+#  # Visual Content Service
+#  visual-content-service:
+#    build:
+#      context: .
+#      dockerfile: microservice-visual-content/Dockerfile
+#    container_name: visual-content-service
+#    ports:
+#      - "8084:8084"
+#    depends_on:
+#      postgres:
+#        condition: service_healthy
 
   # Weather Service
   weather-service:
@@ -214,6 +212,76 @@ services:
         condition: service_healthy
       kafka:
         condition: service_healthy
+
+  # API Gateway Service
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_CLOUD_GATEWAY_ROUTES_0_ID: microservice-user-management-auth
+      SPRING_CLOUD_GATEWAY_ROUTES_0_URI: http://user-management-service:8082
+      SPRING_CLOUD_GATEWAY_ROUTES_0_PREDICATES_0: Path=/api/v1/auth/**
+
+      SPRING_CLOUD_GATEWAY_ROUTES_1_ID: microservice-user-management
+      SPRING_CLOUD_GATEWAY_ROUTES_1_URI: http://user-management-service:8082
+      SPRING_CLOUD_GATEWAY_ROUTES_1_PREDICATES_0: Path=/api/v1/user/**
+      SPRING_CLOUD_GATEWAY_ROUTES_1_FILTERS_0: GatewayJwtFilter
+
+      SPRING_CLOUD_GATEWAY_ROUTES_2_ID: microservice-window-management
+      SPRING_CLOUD_GATEWAY_ROUTES_2_URI: http://window-management-service:8083
+      SPRING_CLOUD_GATEWAY_ROUTES_2_PREDICATES_0: Path=/api/v1/windows/**
+      SPRING_CLOUD_GATEWAY_ROUTES_2_FILTERS_0_NAME: GatewayJwtFilter
+      SPRING_CLOUD_GATEWAY_ROUTES_2_FILTERS_0_ARGS_SECRET: ${JWT_SECRET}
+
+      SPRING_CLOUD_GATEWAY_ROUTES_3_ID: microservice-analytics
+      SPRING_CLOUD_GATEWAY_ROUTES_3_URI: http://analytics-service:8080
+      SPRING_CLOUD_GATEWAY_ROUTES_3_PREDICATES_0: Path=/api/v1/analytics/**
+      SPRING_CLOUD_GATEWAY_ROUTES_3_FILTERS_0: GatewayJwtFilter
+
+#      SPRING_CLOUD_GATEWAY_ROUTES_4_ID: microservice-notifications
+#      SPRING_CLOUD_GATEWAY_ROUTES_4_URI: http://notifications-service:8081
+#      SPRING_CLOUD_GATEWAY_ROUTES_4_PREDICATES_0: Path=/api/v1/notifications/**
+#      SPRING_CLOUD_GATEWAY_ROUTES_4_FILTERS_0: GatewayJwtFilter
+
+      SPRING_CLOUD_GATEWAY_ROUTES_5_ID: microservice-presets
+      SPRING_CLOUD_GATEWAY_ROUTES_5_URI: http://presets-service:8082
+      SPRING_CLOUD_GATEWAY_ROUTES_5_PREDICATES_0: Path=/api/v1/presets/**
+      SPRING_CLOUD_GATEWAY_ROUTES_5_FILTERS_0: GatewayJwtFilter
+
+#      SPRING_CLOUD_GATEWAY_ROUTES_6_ID: microservice-visual-content
+#      SPRING_CLOUD_GATEWAY_ROUTES_6_URI: http://visual-content-service:8084
+#      SPRING_CLOUD_GATEWAY_ROUTES_6_PREDICATES_0: Path=/api/v1/visual/**
+#      SPRING_CLOUD_GATEWAY_ROUTES_6_FILTERS_0: GatewayJwtFilter
+
+      SPRING_CLOUD_GATEWAY_ROUTES_7_ID: microservice-weather
+      SPRING_CLOUD_GATEWAY_ROUTES_7_URI: http://weather-service:8085
+      SPRING_CLOUD_GATEWAY_ROUTES_7_PREDICATES_0: Path=/api/v1/weather/**
+      SPRING_CLOUD_GATEWAY_ROUTES_7_FILTERS_0: AddRequestHeader=X-Yandex-Weather-Key,${YWAPI_KEY}
+      SPRING_CLOUD_GATEWAY_ROUTES_7_FILTERS_1_NAME: GatewayJwtFilter
+      SPRING_CLOUD_GATEWAY_ROUTES_7_FILTERS_1_ARGS_SECRET: ${JWT_SECRET}
+
+      JWT_SECRET: ${JWT_SECRET}
+      YWAPI_KEY: ${YWAPI_KEY}
+    depends_on:
+      - presets-service
+      - analytics-service
+      - user-management-service
+      - window-management-service
+#      - notifications-service
+#      - visual-content-service
+      - weather-service
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
   postgres_data:
