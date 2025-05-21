@@ -30,7 +30,7 @@
 - **api-gateway**: 
   - Топики: `preset-request-topic`, `preset-response-topic`
 
-**Дизайн API:** Разработано в соответствии с корпоративным API Design Guide
+**Дизайн API:** Разработано в соответствии с API Design Guide
 
 
 ## 3. Способы запуска
