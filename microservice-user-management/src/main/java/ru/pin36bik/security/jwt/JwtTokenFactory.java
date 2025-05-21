@@ -1,6 +1,7 @@
 package ru.pin36bik.security.jwt;
 
 import io.jsonwebtoken.Jwts;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.pin36bik.entity.User;
 
@@ -10,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 @RequiredArgsConstructor
+@Getter
 public class JwtTokenFactory {
 
     private final SecretKey secretKey;

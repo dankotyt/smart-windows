@@ -30,7 +30,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final UserRepository userRepository;
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request,
+    public void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
 
@@ -84,7 +84,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
     }
 
-    private String extractAccessToken(HttpServletRequest request) {
+    public String extractAccessToken(HttpServletRequest request) {
         String header = request.getHeader(AUTH_HEADER);
         if (header != null && header.startsWith(TOKEN_PREFIX)) {
             return header.substring(TOKEN_PREFIX.length());
@@ -101,7 +101,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         return null;
     }
 
-    private String extractRefreshToken(HttpServletRequest request) {
+    public String extractRefreshToken(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {

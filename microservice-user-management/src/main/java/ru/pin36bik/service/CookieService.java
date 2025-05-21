@@ -39,7 +39,7 @@ public class CookieService {
         expireCookie(response, "__Host-refresh", "/");
     }
 
-    private void expireCookie(HttpServletResponse response, String name, String path) {
+    public void expireCookie(HttpServletResponse response, String name, String path) {
         ResponseCookie cookie = ResponseCookie.from(name, "")
                 .maxAge(0)
                 .path(path)

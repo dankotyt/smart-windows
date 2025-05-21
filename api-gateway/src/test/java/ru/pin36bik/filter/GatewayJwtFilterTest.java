@@ -45,20 +45,10 @@ public class GatewayJwtFilterTest {
     private RequestHeadersSpec requestHeadersSpec;
 
     @Mock
-    private ResponseSpec responseSpec;
-
-    @Mock
     private GatewayFilterChain filterChain;
 
     @InjectMocks
     private GatewayJwtFilter gatewayJwtFilter;
-
-    private void setupWebClientMock() {
-        when(webClient.get()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.header(anyString(), anyString())).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.exchangeToMono(any())).thenReturn(Mono.empty());
-    }
 
     @Test
     public void testApply_AuthEndpoint_ShouldPassThrough() {

@@ -36,14 +36,13 @@ public class GatewayJwtTokenParser {
                 .getPayload()
                 .getSubject();
     }
-
-    public List<String> extractRoles(String token) {
-        Claims claims = Jwts.parser()
-                .verifyWith(secretKey)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
-
-        return (List<String>) claims.get("roles", List.class);
-    }
+//    public List<String> extractRoles(String token) {
+//        Claims claims = Jwts.parser()
+//                .verifyWith(secretKey)
+//                .build()
+//                .parseSignedClaims(token)
+//                .getPayload();
+//
+//        return (List<String>) claims.get("roles", List.class);
+//    }
 }

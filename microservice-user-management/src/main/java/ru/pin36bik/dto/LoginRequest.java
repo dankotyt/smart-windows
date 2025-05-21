@@ -2,6 +2,7 @@ package ru.pin36bik.dto;
 
 import jakarta.validation.constraints.Email;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
