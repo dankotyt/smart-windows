@@ -20,22 +20,24 @@ java {
 dependencies {
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("com.h2database:h2")
+
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("redis.clients:jedis:5.0.2")
-    //implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.kafka:spring-kafka")
     implementation("org.postgresql:postgresql")
     implementation("org.projectlombok:lombok")
     implementation("org.modelmapper:modelmapper:2.4.4")
     implementation("io.github.cdimascio:dotenv-java:3.0.0")
-    annotationProcessor("org.projectlombok:lombok")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
     implementation("com.fasterxml.jackson.core:jackson-databind")
-    testImplementation("com.h2database:h2")
+
+    annotationProcessor("org.projectlombok:lombok")
 }
 
 tasks.test {

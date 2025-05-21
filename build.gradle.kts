@@ -44,6 +44,8 @@ dependencies {
 	implementation("org.modelmapper:modelmapper:2.4.4")
 	implementation ("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
 	implementation("io.swagger.parser.v3:swagger-parser:2.1.22")
+	implementation("javax.xml.bind:jaxb-api:2.3.1")
+
 }
 
 tasks.withType<Test> {

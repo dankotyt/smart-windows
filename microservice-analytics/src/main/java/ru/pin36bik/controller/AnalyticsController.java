@@ -12,16 +12,13 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.pin36bik.dto.PresetAnalyticsDTO;
 import ru.pin36bik.dto.UserAnalyticsDTO;
+import ru.pin36bik.exceptions.InvalidTokenException;
 import ru.pin36bik.service.AnalyticsService;
 
 @RestController
@@ -30,6 +27,7 @@ import ru.pin36bik.service.AnalyticsService;
         produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Window Analytics API",
         description = "API для работы с данными об использовании умных окон")
+@Slf4j
 public class AnalyticsController {
 
     private final AnalyticsService analyticsService;
@@ -46,9 +44,16 @@ public class AnalyticsController {
                     description = "Некорректные данные пресета")
     })
     public ResponseEntity<?> createPreset(
+            @RequestHeader("X-User-Email") String userEmail,
+            @RequestHeader("X-Valid-Token") String validToken,
             @Parameter(description = "Данные пресета в формате JSON",
                     required = true)
             @Valid @RequestBody final PresetAnalyticsDTO presetAnalyticsDTO) {
+        if (!"true".equals(validToken)) {
+            throw new InvalidTokenException("Token validation failed");
+        }
+
+        log.info("Received request on creating preset from user: " + userEmail);
         if (presetAnalyticsDTO.getPresetName() == null
                 || presetAnalyticsDTO.getPresetName().isEmpty()) {
             return ResponseEntity.badRequest().body(
@@ -68,9 +73,16 @@ public class AnalyticsController {
                     description = "Пресет не найден")
     })
     public ResponseEntity<PresetAnalyticsDTO> getPresetByName(
+            @RequestHeader("X-User-Email") String userEmail,
+            @RequestHeader("X-Valid-Token") String validToken,
             @Parameter(description = "Название пресета",
                     required = true, example = "test-preset")
             @PathVariable("preset-name") final String presetName) {
+        if (!"true".equals(validToken)) {
+            throw new InvalidTokenException("Token validation failed");
+        }
+
+        log.info("Received request on getting preset from user: " + userEmail);
         Optional<PresetAnalyticsDTO> preset = analyticsService.
                 getPresetAnalytics(presetName);
         return preset.map(ResponseEntity::ok)
@@ -90,9 +102,16 @@ public class AnalyticsController {
                     description = "Некорректные данные!")
     })
     public ResponseEntity<LocalDateTime> recordPresetDownload(
+            @RequestHeader("X-User-Email") String userEmail,
+            @RequestHeader("X-Valid-Token") String validToken,
             @Parameter(description = "Название пресета в формате JSON",
                     required = true, example = "test-preset")
             @Valid @RequestBody final String presetName) {
+        if (!"true".equals(validToken)) {
+            throw new InvalidTokenException("Token validation failed");
+        }
+
+        log.info("Received request on downloading preset from user: " + userEmail);
         return ResponseEntity.ok(
                 analyticsService.recordPresetDownload(presetName));
     }
@@ -108,7 +127,14 @@ public class AnalyticsController {
             @ApiResponse(responseCode = "404",
                     description = "Пресеты не найдены")
     })
-    public ResponseEntity<PresetAnalyticsDTO> getMostDownloadedPreset() {
+    public ResponseEntity<PresetAnalyticsDTO> getMostDownloadedPreset(
+            @RequestHeader("X-User-Email") String userEmail,
+            @RequestHeader("X-Valid-Token") String validToken) {
+        if (!"true".equals(validToken)) {
+            throw new InvalidTokenException("Token validation failed");
+        }
+
+        log.info("Received request on getting most downloaded preset from user: " + userEmail);
         return analyticsService.getMostDownloadedPreset()
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -125,9 +151,16 @@ public class AnalyticsController {
                     description = "Некорректные данные пресета")
     })
     public ResponseEntity<UserAnalyticsDTO> createUser(
+            @RequestHeader("X-User-Email") String userEmail,
+            @RequestHeader("X-Valid-Token") String validToken,
             @Parameter(description = "Данные пресета в формате JSON",
                     required = true)
             @Valid @RequestBody final UserAnalyticsDTO userAnalyticsDTO) {
+        if (!"true".equals(validToken)) {
+            throw new InvalidTokenException("Token validation failed");
+        }
+
+        log.info("Received request on creating new user from user: " + userEmail);
         return ResponseEntity.ok(analyticsService
                 .saveUserAnalytics(userAnalyticsDTO));
     }
@@ -145,9 +178,16 @@ public class AnalyticsController {
                     description = "Некорректные данные!")
     })
     public ResponseEntity<LocalDateTime> recordUserLogin(
+            @RequestHeader("X-User-Email") String userEmail,
+            @RequestHeader("X-Valid-Token") String validToken,
             @Parameter(description = "ID пользователя в формате JSON",
                     required = true, example = "12345")
             @Valid @RequestBody final Long userId) {
+        if (!"true".equals(validToken)) {
+            throw new InvalidTokenException("Token validation failed");
+        }
+
+        log.info("Received request on logging in from user: " + userEmail);
         return ResponseEntity.ok(analyticsService.recordUserLogin(userId));
     }
 
@@ -161,9 +201,16 @@ public class AnalyticsController {
                     description = "Пользователь не найден")
     })
     public ResponseEntity<UserAnalyticsDTO> getUserById(
+            @RequestHeader("X-User-Email") String userEmail,
+            @RequestHeader("X-Valid-Token") String validToken,
             @Parameter(description = "Идентификатор пользователя",
                     required = true, example = "12345")
             @PathVariable("user-id") final Long userId) {
+        if (!"true".equals(validToken)) {
+            throw new InvalidTokenException("Token validation failed");
+        }
+
+        log.info("Received request on getting user from user: " + userEmail);
         Optional<UserAnalyticsDTO> user = analyticsService.
                 getUserAnalytics(userId);
         return user.map(ResponseEntity::ok)
@@ -180,7 +227,14 @@ public class AnalyticsController {
             @ApiResponse(responseCode = "404",
                     description = "Пользователи не найдены")
     })
-    public ResponseEntity<UserAnalyticsDTO> getUserWithEarliestLogin() {
+    public ResponseEntity<UserAnalyticsDTO> getUserWithEarliestLogin(
+            @RequestHeader("X-User-Email") String userEmail,
+            @RequestHeader("X-Valid-Token") String validToken) {
+        if (!"true".equals(validToken)) {
+            throw new InvalidTokenException("Token validation failed");
+        }
+
+        log.info("Received request on getting user with earliest login from user: " + userEmail);
         return analyticsService.getUserWithEarliestLogin()
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

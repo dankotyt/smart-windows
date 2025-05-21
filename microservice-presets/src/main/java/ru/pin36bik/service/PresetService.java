@@ -1,5 +1,6 @@
 package ru.pin36bik.service;
 
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -13,20 +14,12 @@ import ru.pin36bik.exceptions.PresetNotFoundException;
 import ru.pin36bik.repository.PresetRepository;
 
 @Service
+@RequiredArgsConstructor
 public class PresetService {
 
     private final PresetRepository presetRepos;
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ModelMapper modelMapper;
-
-    @Autowired
-    public PresetService(final PresetRepository myPresetRepos,
-                         final KafkaTemplate<String, String> myKafkaTemplate,
-                         final ModelMapper myModelMapper) {
-        this.presetRepos = myPresetRepos;
-        this.kafkaTemplate = myKafkaTemplate;
-        this.modelMapper = myModelMapper;
-    }
 
     @Cacheable(value = "presets", key = "#id")
     public PresetDTO getPresetById(final Long id) {

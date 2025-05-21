@@ -1,6 +1,8 @@
 package ru.pin36bik.service;
 
 import java.time.LocalDateTime;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
@@ -9,18 +11,11 @@ import ru.pin36bik.repository.PresetAnalyticsRepository;
 import ru.pin36bik.repository.UserAnalyticsRepository;
 
 @Service
+@RequiredArgsConstructor
 public class KafkaConsumerService {
 
     private final PresetAnalyticsRepository presetRepository;
     private final UserAnalyticsRepository userRepository;
-
-    @Autowired
-    public KafkaConsumerService(
-            final PresetAnalyticsRepository myPresetRepository,
-            final UserAnalyticsRepository myUserRepository) {
-        this.presetRepository = myPresetRepository;
-        this.userRepository = myUserRepository;
-    }
 
     @KafkaListener(topics = "preset-download-topic",
             groupId = "test-consumer-group")

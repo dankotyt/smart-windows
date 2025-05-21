@@ -8,6 +8,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,37 +18,24 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.pin36bik.dto.PresetDTO;
+import ru.pin36bik.exceptions.InvalidTokenException;
 import ru.pin36bik.exceptions.PresetNotFoundException;
 import ru.pin36bik.service.PresetService;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/presets",
         produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Preset API",
         description = "API для управления пресетами настроек окна")
+@Slf4j
 public class PresetController {
 
     private final PresetService presetService;
     private final KafkaTemplate<String, PresetDTO> kafkaTemplate;
-
-    @Autowired
-    public PresetController(final PresetService myPresetService,
-                            final KafkaTemplate<String,
-                                    PresetDTO> myKafkaTemplate) {
-        this.presetService = myPresetService;
-        this.kafkaTemplate = myKafkaTemplate;
-    }
 
     @Operation(summary = "Получить пресет по ID",
             description = "Возвращает пресет по указанному ID")
@@ -57,9 +47,16 @@ public class PresetController {
     })
     @GetMapping("/get-by-id/{id}")
     public ResponseEntity<PresetDTO> getPresetById(
+            @RequestHeader("X-User-Email") String userEmail,
+            @RequestHeader("X-Valid-Token") String validToken,
             @Parameter(description = "ID пресета",
                     required = true, example = "1")
             @PathVariable final Long id) {
+        if (!"true".equals(validToken)) {
+            throw new InvalidTokenException("Token validation failed");
+        }
+
+        log.info("Received request on getting preset from user: " + userEmail);
         try {
             PresetDTO presetDTO = presetService.getPresetById(id);
             return ResponseEntity.ok(presetDTO);
@@ -78,9 +75,16 @@ public class PresetController {
     })
     @PostMapping("/create")
     public ResponseEntity<PresetDTO> createPreset(
+            @RequestHeader("X-User-Email") String userEmail,
+            @RequestHeader("X-Valid-Token") String validToken,
             @Parameter(description = "Данные пресета в формате JSON",
                     required = true)
             @Valid @RequestBody final PresetDTO presetDTO) {
+        if (!"true".equals(validToken)) {
+            throw new InvalidTokenException("Token validation failed");
+        }
+
+        log.info("Received request on creating preset from user: " + userEmail);
         return ResponseEntity.ok(presetService.createPreset(presetDTO));
     }
 
@@ -96,6 +100,8 @@ public class PresetController {
     })
     @PutMapping("/update-by-id/{id}")
     public ResponseEntity<PresetDTO> updatePresetById(
+            @RequestHeader("X-User-Email") String userEmail,
+            @RequestHeader("X-Valid-Token") String validToken,
             @Parameter(description = "ID пресета",
                     required = true,
                     example = "1")
@@ -103,6 +109,11 @@ public class PresetController {
             @Parameter(description = "Обновленные данные пресета",
                     required = true)
             @Valid @RequestBody final PresetDTO presetDTO) {
+        if (!"true".equals(validToken)) {
+            throw new InvalidTokenException("Token validation failed");
+        }
+
+        log.info("Received request on updating preset from user: " + userEmail);
         return ResponseEntity.ok(presetService.updatePreset(presetDTO));
     }
 
@@ -116,10 +127,17 @@ public class PresetController {
     })
     @DeleteMapping("/delete-by-id/{id}")
     public ResponseEntity<Void> deletePresetById(
+            @RequestHeader("X-User-Email") String userEmail,
+            @RequestHeader("X-Valid-Token") String validToken,
             @Parameter(description = "ID пресета",
                     required = true,
                     example = "1")
             @PathVariable final Long id) {
+        if (!"true".equals(validToken)) {
+            throw new InvalidTokenException("Token validation failed");
+        }
+
+        log.info("Received request on deleting preset from user: " + userEmail);
         presetService.deletePreset(id);
         return ResponseEntity.noContent().build();
     }
