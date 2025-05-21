@@ -80,6 +80,8 @@ services:
       - "8080:8080"
     env_file:
       - .env
+    volumes:
+      - ./.env:/app/.env
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 30s
@@ -94,6 +96,8 @@ services:
       - "8084:8080"
     env_file:
       - .env
+    volumes:
+      - ./.env:/app/.env
     depends_on:
       postgres:
         condition: service_healthy
@@ -108,6 +112,8 @@ services:
       - "8082:8080"
     env_file:
       - .env
+    volumes:
+      - ./.env:/app/.env
     depends_on:
       postgres:
         condition: service_healthy
@@ -122,6 +128,8 @@ services:
       - "8086:8080"
     env_file:
       - .env
+    volumes:
+      - ./.env:/app/.env
     depends_on:
       postgres:
         condition: service_healthy
@@ -138,6 +146,8 @@ services:
       - "8088:8080"
     env_file:
       - .env
+    volumes:
+      - ./.env:/app/.env
     depends_on:
       postgres:
         condition: service_healthy
@@ -152,6 +162,8 @@ services:
       - "8083:8080"
     env_file:
       - .env
+    volumes:
+      - ./.env:/app/.env
     depends_on:
       postgres:
         condition: service_healthy
