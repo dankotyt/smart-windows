@@ -63,7 +63,7 @@ BD_PASSWORD=your_db_password
 
 ## 6. API документация:
 
-При запущенном AnalyticsApplication: http://localhost:8083/swagger-ui.html
+При запущенном AnalyticsApplication: http://localhost:8084/swagger-ui.html
 
 В остальных случаях:
 
