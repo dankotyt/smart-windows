@@ -3,3 +3,10 @@ spring:
     name: smart-windows
   kafka:
     bootstrap-servers: localhost:9092
+
+server:
+  port: 8079
+
+springdoc:
+  swagger-ui:
+    url: classpath:/openapi.yaml

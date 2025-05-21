@@ -55,7 +55,7 @@ public class PresetController {
             @ApiResponse(responseCode = "404",
                     description = "Пресет не найден")
     })
-    @GetMapping("get-by-id/{id}")
+    @GetMapping("/get-by-id/{id}")
     public ResponseEntity<PresetDTO> getPresetById(
             @Parameter(description = "ID пресета",
                     required = true, example = "1")

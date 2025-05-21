@@ -1,0 +1,1269 @@
+openapi: 3.0.4
+info:
+  title: Smart Windows
+  description: |-
+    Smart Windows - это приложение на базе IoT, предназначенное для того, чтобы пользователи могли удаленно управлять своими умными окнами с помощью мобильного или веб-приложения.
+
+    Полезные ссылки:
+    - [Репозиторий Smart Windows на GitHub](https://github.com/dankotyt/smart-windows)
+
+  contact:
+    email: danilkotlarov1@gmail.com
+  version: 0.0.1
+servers:
+  - url: http://localhost:8080/api/v1/
+    description: dev server
+tags:
+  - name: analytics
+    description: API для управления сбором и анализом данных об использовании окон
+  - name: presets
+    description: API для управления пресетами настроек окон
+  - name: auth
+    description: API для авторизации и аутентификации пользователей
+  - name: user
+    description: API для создания и редактирования профиля пользователя, как с ролью USER, так и с ролью ADMIN
+  - name: weather
+    description: API для получения данных о погоде
+  - name: windows
+    description: API для взаимодействия с умными окнами
+paths:
+  /analytics/presets:
+    post:
+      tags:
+        - analytics
+      summary: Создать новый пресет
+      description: Создает новую запись аналитики для пресета
+      operationId: createPreset
+      requestBody:
+        description: Данные пресета в формате JSON
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PresetAnalyticsDTO'
+      responses:
+        '200':
+          description: Пресет успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresetAnalyticsDTO'
+        '400':
+          description: Некорректные данные пресета
+  /analytics/presets/downloads:
+    post:
+      tags:
+        - analytics
+      summary: Зарегистрировать загрузку пресета
+      description: Регистрирует факт загрузки пресета с заданным названием
+      operationId: recordPresetDownload
+      requestBody:
+        description: Название пресета в формате JSON
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+              example: "Morning_Mode"
+      responses:
+        '200':
+          description: Загрузка зарегистрирована
+          content:
+            application/json:
+              schema:
+                type: string
+                format: date-time
+        '400':
+          description: Некорректные данные
+  /analytics/users:
+    post:
+      tags:
+        - analytics
+      summary: Создать нового пользователя
+      description: Создает новую запись аналитики для пользователя
+      operationId: createUser
+      requestBody:
+        description: Данные пользователя в формате JSON
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserAnalyticsDTO'
+      responses:
+        '200':
+          description: Пользователь успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAnalyticsDTO'
+        '400':
+          description: Некорректные данные пользователя
+  /analytics/users/logins:
+    post:
+      tags:
+        - analytics
+      summary: Зарегистрировать вход пользователя
+      description: Регистрирует факт входа пользователя с заданным ID в систему
+      operationId: recordUserLogin
+      requestBody:
+        description: ID пользователя в формате JSON
+        required: true
+        content:
+          application/json:
+            schema:
+              type: integer
+              format: int64
+              example: 12345
+      responses:
+        '200':
+          description: Вход зарегистрирован
+          content:
+            application/json:
+              schema:
+                type: string
+                format: date-time
+        '400':
+          description: Некорректные данные
+  /analytics/presets/get-preset-by-name/{preset_name}:
+    get:
+      tags:
+        - analytics
+      summary: Найти пресет по его названию
+      description: Возвращает пресет по указанному названию
+      operationId: getPresetByName
+      parameters:
+        - name: preset_name
+          in: path
+          description: Название пресета
+          required: true
+          schema:
+            type: string
+            example: "Test_Preset"
+      responses:
+        '200':
+          description: Пресет успешно получен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresetAnalyticsDTO'
+        '404':
+          description: Пресет не найден
+  /analytics/presets/most-downloaded:
+    get:
+      tags:
+        - analytics
+      summary: Получить самый популярный пресет
+      description: Возвращает пресет с наибольшим количеством скачиваний
+      operationId: getMostDownloadedPreset
+      responses:
+        '200':
+          description: Пресет найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresetAnalyticsDTO'
+        '404':
+          description: Пресеты не найдены
+  /analytics/users/get-user-by-id/{user_id}:
+    get:
+      tags:
+        - analytics
+      summary: Найти пользователя по его ID
+      description: Возвращает запись о пользователе по указанному ID
+      operationId: getUserById
+      parameters:
+        - name: user_id
+          in: path
+          description: Идентификатор пользователя
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 12345
+      responses:
+        '200':
+          description: Пользователь успешно получен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAnalyticsDTO'
+        '404':
+          description: Пользователь не найден
+  /analytics/users/earliest-login:
+    get:
+      tags:
+        - analytics
+      summary: Получить пользователя с самым старым логином
+      description: Возвращает пользователя с самым ранним зарегистрированным входом
+      operationId: getUserWithEarliestLogin
+      responses:
+        '200':
+          description: Пользователь найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAnalyticsDTO'
+        '404':
+          description: Пользователи не найдены
+  /presets/get-by-id/{id}:
+    get:
+      tags:
+        - presets
+      summary: Найти пресет по ID
+      description: Возвращает пресет по указанному ID
+      operationId: getPresetById
+      parameters:
+        - name: id
+          in: path
+          description: ID пресета
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 1
+      responses:
+        '200':
+          description: Пресет успешно получен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresetDTO'
+        '404':
+          description: Пресет не найден
+
+  /presets/create:
+    post:
+      tags:
+        - presets
+      summary: Создать новый пресет
+      description: Создает и возвращает новый пресет
+      operationId: createPreset
+      requestBody:
+        description: Данные пресета в формате JSON
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PresetDTO'
+      responses:
+        '201':
+          description: Пресет успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresetDTO'
+        '400':
+          description: Некорректные данные
+
+  /presets/update-by-id/{id}:
+    put:
+      tags:
+        - presets
+      summary: Обновить пресет
+      description: Обновляет и возвращает существующий пресет
+      operationId: updatePresetById
+      parameters:
+        - name: id
+          in: path
+          description: ID пресета
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 1
+      requestBody:
+        description: Обновленные данные пресета
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PresetDTO'
+      responses:
+        '200':
+          description: Пресет успешно обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresetDTO'
+        '404':
+          description: Пресет не найден
+        '400':
+          description: Некорректные данные
+
+  /presets/delete-by-id/{id}:
+    delete:
+      tags:
+        - presets
+      summary: Удалить пресет
+      description: Удаляет пресет по указанному ID
+      operationId: deletePresetById
+      parameters:
+        - name: id
+          in: path
+          description: ID пресета
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 1
+      responses:
+        '204':
+          description: Пресет успешно удален
+        '404':
+          description: Пресет не найден
+  /auth/register:
+    post:
+      tags:
+        - auth
+      summary: Регистрация пользователя
+      description: Регистрирует нового пользователя и возвращает токены
+      operationId: register
+      requestBody:
+        description: Данные для регистрации
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '200':
+          description: Успешная регистрация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: "__Host-refresh=abc123; Path=/; Secure; HttpOnly; SameSite=Strict"
+
+  /auth/login:
+    post:
+      tags:
+        - auth
+      summary: Вход пользователя
+      description: Аутентифицирует пользователя и возвращает токены
+      operationId: login
+      requestBody:
+        description: Данные для входа
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Успешный вход
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: "__Host-refresh=abc123; Path=/; Secure; HttpOnly; SameSite=Strict"
+
+  /auth/refresh:
+    post:
+      tags:
+        - auth
+      summary: Обновление токена
+      description: Обновляет access token по refresh token
+      operationId: refreshToken
+      parameters:
+        - name: __Host-refresh
+          in: cookie
+          description: Refresh token
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Токены обновлены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: "__Host-refresh=newToken; Path=/; Secure; HttpOnly; SameSite=Strict"
+        '401':
+          description: Недействительный refresh token
+
+  /auth/logout:
+    post:
+      tags:
+        - auth
+      summary: Выход пользователя
+      description: Инвалидирует токены пользователя
+      operationId: logout
+      parameters:
+        - name: __Host-refresh
+          in: cookie
+          description: Refresh token
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Успешный выход
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: "__Host-refresh=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
+
+  /auth/validate:
+    get:
+      tags:
+        - auth
+      summary: Валидация токена
+      description: Проверяет валидность access token
+      operationId: validateToken
+      parameters:
+        - name: Authorization
+          in: header
+          description: Bearer token
+          required: true
+          schema:
+            type: string
+            example: "Bearer abc123"
+      responses:
+        '200':
+          description: Токен валиден
+        '401':
+          description: Токен недействителен
+          
+  /user/admin/get_users:
+    get:
+      tags:
+        - user
+      summary: Получить всех пользователей (админ)
+      description: Возвращает список всех пользователей (только для админа)
+      operationId: getAllUsersByAdmin
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Список пользователей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserDTOForAdmin'
+        '403':
+          description: Доступ запрещен
+
+  /user/admin/get_by_id/{id}:
+    get:
+      tags:
+        - user
+      summary: Получить пользователя по ID (админ)
+      description: Возвращает пользователя по ID (только для админа)
+      operationId: getUserByIdAdmin
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID пользователя
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Данные пользователя
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '403':
+          description: Доступ запрещен
+        '404':
+          description: Пользователь не найден
+  /user/admin/get_by_email/{email}:
+    get:
+      tags:
+        - user
+      summary: Получить пользователя по email (админ)
+      description: Возвращает полные данные пользователя по email (только для админа)
+      operationId: getUserByEmailAdmin
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: email
+          in: path
+          description: Email пользователя
+          required: true
+          schema:
+            type: string
+            format: email
+            example: "admin@example.com"
+      responses:
+        '200':
+          description: Данные пользователя
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '403':
+          description: Доступ запрещен (требуются права администратора)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /user/update:
+    put:
+      tags:
+        - user
+      summary: Обновить данные пользователя
+      description: Обновляет данные текущего пользователя
+      operationId: updateCurrentUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Новые данные пользователя
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDTO'
+      responses:
+        '200':
+          description: Данные обновлены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+        '403':
+          description: Доступ запрещен
+
+  /user/delete:
+    delete:
+      tags:
+        - user
+      summary: Удалить пользователя
+      description: Удаляет и архивирует пользователя
+      operationId: deleteAndArchiveCurrentUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: email
+          in: query
+          description: Email пользователя
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Пользователь удален
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: "__Host-refresh=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
+        '403':
+          description: Доступ запрещен
+          
+  /weather/get_weather/{windowId}:
+    get:
+      tags:
+        - weather
+      summary: Получить погодные данные для окна
+      description: Возвращает текущую погоду и прогноз для указанного окна
+      operationId: getWeather
+      parameters:
+        - name: windowId
+          in: path
+          description: ID окна
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 1001
+        - name: X-Yandex-Weather-Key
+          in: header
+          description: Ключ API Яндекс.Погоды
+          required: true
+          schema:
+            type: string
+            example: "your-api-key-123"
+        - name: X-User-Email
+          in: header
+          description: Email пользователя
+          required: true
+          schema:
+            type: string
+            format: email
+            example: "user@example.com"
+        - name: X-Valid-Token
+          in: header
+          description: Валидный токен (должен быть "true")
+          required: true
+          schema:
+            type: string
+            example: "true"
+      responses:
+        '200':
+          description: Погодные данные успешно получены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeatherDTO'
+        '401':
+          description: Невалидный токен
+        '404':
+          description: Окно не найдено
+          
+  /windows/add:
+    post:
+      tags:
+        - windows
+      summary: Добавить новое окно
+      operationId: addWindow
+      parameters:
+        - name: X-User-Email
+          in: header
+          required: true
+          schema:
+            type: string
+            format: email
+        - name: X-Valid-Token
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "true"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WindowRequest'
+      responses:
+        '200':
+          description: Окно успешно добавлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WindowResponse'
+        '401':
+          description: Невалидный токен
+
+  /windows/update/{windowId}:
+    patch:
+      tags:
+        - windows
+      summary: Обновить данные окна
+      operationId: updateWindow
+      parameters:
+        - name: windowId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: X-User-Email
+          in: header
+          required: true
+          schema:
+            type: string
+            format: email
+        - name: X-Valid-Token
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "true"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WindowRequestForUpdate'
+      responses:
+        '200':
+          description: Данные окна обновлены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WindowResponse'
+        '401':
+          description: Невалидный токен
+        '404':
+          description: Окно не найдено
+
+  /windows/user/{userEmail}:
+    get:
+      tags:
+        - windows
+      summary: Получить окна пользователя
+      operationId: getWindowsByUserEmail
+      parameters:
+        - name: userEmail
+          in: path
+          required: true
+          schema:
+            type: string
+            format: email
+        - name: X-User-Email
+          in: header
+          required: true
+          schema:
+            type: string
+            format: email
+        - name: X-Valid-Token
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "true"
+      responses:
+        '200':
+          description: Список окон пользователя
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WindowUserDTO'
+        '401':
+          description: Невалидный токен
+
+  /windows/delete/{windowId}:
+    delete:
+      tags:
+        - windows
+      summary: Удалить окно
+      operationId: deleteWindow
+      parameters:
+        - name: windowId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: X-User-Email
+          in: header
+          required: true
+          schema:
+            type: string
+            format: email
+        - name: X-Valid-Token
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "true"
+      responses:
+        '204':
+          description: Окно успешно удалено
+        '401':
+          description: Невалидный токен
+        '404':
+          description: Окно не найдено
+
+  /windows/location/{windowId}:
+    get:
+      tags:
+        - windows
+      summary: Получить местоположение окна
+      operationId: getWindowLocation
+      parameters:
+        - name: windowId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: X-User-Email
+          in: header
+          required: true
+          schema:
+            type: string
+            format: email
+        - name: X-Valid-Token
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "true"
+      responses:
+        '200':
+          description: Местоположение окна
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WindowLocationDTO'
+        '401':
+          description: Невалидный токен
+        '404':
+          description: Окно не найдено
+          
+components:
+  schemas:
+    PresetAnalyticsDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        presetName:
+          type: string
+        downloadsNumber:
+          type: integer
+          format: int64
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    UserAnalyticsDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        userId:
+          type: integer
+          format: int64
+        loginCount:
+          type: integer
+          format: int64
+        lastLoginAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+    PresetDTO:
+      type: object
+      description: Конфигурация пресета настроек окна
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Уникальный идентификатор
+          example: 1
+          readOnly: true
+        preset_name:
+          type: string
+          description: Название пресета
+          example: "Стандартные настройки"
+        ventilation_flag:
+          type: boolean
+          description: Флаг проветривания
+          example: true
+        ventilation_timer:
+          type: integer
+          description: Время проветривания (секунды)
+          example: 600
+          minimum: 0
+          maximum: 86400
+        darkness_value:
+          type: integer
+          description: Уровень затемнения (0-100)
+          example: 75
+          minimum: 0
+          maximum: 100
+        frame_color:
+          type: integer
+          description: Цвет подсветки (RGB)
+          example: 16777215
+      required:
+        - preset_name
+        - ventilation_flag
+        - ventilation_timer
+        - darkness_value
+        - frame_color
+
+    RegisterRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Имя пользователя
+          example: "Иван"
+        surname:
+          type: string
+          description: Фамилия пользователя
+          example: "Иванов"
+        birthday:
+          type: string
+          format: date
+          description: Дата рождения
+          example: "1990-01-01"
+        email:
+          type: string
+          format: email
+          description: Email пользователя
+          example: "user@example.com"
+        password:
+          type: string
+          format: password
+          description: Пароль
+          minLength: 4
+          maxLength: 64
+          example: "securePassword123"
+      required:
+        - name
+        - email
+        - password
+
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          description: Email пользователя
+          example: "user@example.com"
+        password:
+          type: string
+          format: password
+          description: Пароль
+          example: "securePassword123"
+      required:
+        - email
+        - password
+
+    LoginResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: Access token для аутентификации
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        refresh_token:
+          type: string
+          description: Refresh token для обновления access token
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        user:
+          $ref: '#/components/schemas/UserDTO'
+
+    UserDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Уникальный идентификатор пользователя
+          example: 1
+        name:
+          type: string
+          description: Имя пользователя
+          example: "Иван"
+        surname:
+          type: string
+          description: Фамилия пользователя
+          example: "Иванов"
+        birthday:
+          type: string
+          format: date
+          description: Дата рождения
+          example: "1990-01-01"
+        email:
+          type: string
+          format: email
+          description: Email пользователя
+          example: "user@example.com"
+
+    UserDTOForAdmin:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Уникальный идентификатор пользователя
+          example: 1
+        name:
+          type: string
+          description: Имя пользователя
+          example: "Иван"
+        surname:
+          type: string
+          description: Фамилия пользователя
+          example: "Иванов"
+        birthday:
+          type: string
+          format: date
+          description: Дата рождения
+          example: "1990-01-01"
+        email:
+          type: string
+          format: email
+          description: Email пользователя
+          example: "user@example.com"
+        createdAt:
+          type: string
+          format: date-time
+          description: Дата создания аккаунта
+          example: "2023-01-01T12:00:00Z"
+        role:
+          type: string
+          description: Роль пользователя
+          example: "USER"
+          enum:
+            - USER
+            - ADMIN
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Уникальный идентификатор пользователя
+          example: 1
+        name:
+          type: string
+          description: Имя пользователя
+          example: "Алексей"
+        surname:
+          type: string
+          description: Фамилия пользователя
+          example: "Петров"
+        email:
+          type: string
+          format: email
+          description: Email пользователя
+          example: "user@example.com"
+        password:
+          type: string
+          description: Хэш пароля (только для админ-панели)
+          example: "$2a$10$N9qo8uLOickgx2ZMRZoMy..."
+        birthday:
+          type: string
+          format: date
+          description: Дата рождения
+          example: "1990-01-01"
+        createdAt:
+          type: string
+          format: date-time
+          description: Дата регистрации
+          example: "2023-01-01T12:00:00Z"
+        role:
+          $ref: '#/components/schemas/Role'
+      required:
+        - email
+        - password
+        - role
+    WeatherDTO:
+      type: object
+      properties:
+        windowId:
+          type: integer
+          format: int64
+          example: 1001
+        userEmail:
+          type: string
+          format: email
+          example: "user@example.com"
+        location:
+          $ref: '#/components/schemas/WindowLocationDTO'
+        current:
+          $ref: '#/components/schemas/WeatherCurrentDTO'
+        forecasts:
+          type: array
+          items:
+            $ref: '#/components/schemas/WeatherForecastDTO'
+        lastUpdated:
+          type: string
+          format: date-time
+          example: "2023-01-01T12:00:00Z"
+
+    WeatherCurrentDTO:
+      type: object
+      properties:
+        temperature:
+          type: integer
+          example: 20
+        humidity:
+          type: integer
+          example: 65
+        pressure:
+          type: integer
+          example: 760
+        precType:
+          type: string
+          example: "rain"
+        precStrength:
+          type: string
+          example: "0.5"
+        windDirection:
+          type: string
+          example: "nw"
+        windSpeed:
+          type: number
+          format: float
+          example: 3.5
+        condition:
+          type: string
+          example: "cloudy"
+        cloudiness:
+          type: string
+          example: "overcast"
+
+    WeatherForecastDTO:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [TODAY, TOMORROW]
+          example: "TODAY"
+        date:
+          type: string
+          format: date
+          example: "2023-01-01"
+        tempMin:
+          type: integer
+          example: 15
+        tempMax:
+          type: integer
+          example: 22
+        condition:
+          type: string
+          example: "partly-cloudy"
+
+    WindowLocationDTO:
+      type: object
+      properties:
+        cityName:
+          type: string
+          example: "Moscow"
+        latitude:
+          type: number
+          format: double
+          example: 55.7558
+        longitude:
+          type: number
+          format: double
+          example: 37.6176
+
+    WindowRequest:
+      type: object
+      properties:
+        windowId:
+          type: integer
+          format: int64
+          example: 1001
+        name:
+          type: string
+          example: "Living Room Window"
+
+    WindowRequestForUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Updated Window Name"
+
+    WindowResponse:
+      type: object
+      properties:
+        window_id:
+          type: integer
+          format: int64
+          example: 1001
+        userEmail:
+          type: string
+          format: email
+          example: "user@example.com"
+        name:
+          type: string
+          example: "Living Room Window"
+        status:
+          type: boolean
+          example: true
+        presets:
+          type: string
+          example: "default"
+        cityName:
+          type: string
+          example: "Moscow"
+        latitude:
+          type: number
+          format: double
+          example: 55.7558
+        longitude:
+          type: number
+          format: double
+          example: 37.6176
+
+    WindowUserDTO:
+      type: object
+      properties:
+        windowId:
+          type: integer
+          format: int64
+          example: 1001
+        userEmail:
+          type: string
+          format: email
+          example: "user@example.com"
+        name:
+          type: string
+          example: "Living Room Window"
+        status:
+          type: boolean
+          example: true
+        presets:
+          type: string
+          example: "default"
+        location:
+          $ref: '#/components/schemas/WindowLocationDTO'
+
+    Error:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          example: "2023-01-01T12:00:00Z"
+        status:
+          type: integer
+          example: 403
+        error:
+          type: string
+          example: "Forbidden"
+        message:
+          type: string
+          example: "Access denied"
+        path:
+          type: string
+          example: "/api/v1/user/admin/get_by_email/user@example.com"
+
+    Role:
+      type: string
+      enum:
+        - USER
+        - ADMIN
+      description: Роли пользователей в системе
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT токен для аутентификации
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: __Host-refresh
+      description: Refresh token в cookie
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header

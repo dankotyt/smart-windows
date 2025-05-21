@@ -11,7 +11,7 @@ spring:
         - id: microservice-user-management
           uri: http://localhost:8082
           predicates:
-            - Path=/api/v1/user/**
+            - Path=/api/v1/users/**
           filters:
             - GatewayJwtFilter
 

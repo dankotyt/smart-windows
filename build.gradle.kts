@@ -34,11 +34,18 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.modelmapper:modelmapper:2.4.4")
 	implementation ("io.github.cdimascio:dotenv-java:3.0.0")
-	compileOnly("org.projectlombok:lombok")
-	annotationProcessor("org.projectlombok:lombok")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	implementation ("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
+	implementation("io.swagger.parser.v3:swagger-parser:2.1.22")
 	implementation("org.springframework.kafka:spring-kafka")
+
+	compileOnly("org.projectlombok:lombok")
+
+	annotationProcessor("org.projectlombok:lombok")
+
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation ("org.springframework.boot:spring-boot-starter-test:2.7.0")
+
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.withType<Test> {

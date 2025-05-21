@@ -32,4 +32,5 @@ public class Preset {
 
     @Column(name = "frameColor")
     private Integer frameColor;
+    //тест гитхука
 }
