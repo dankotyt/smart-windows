@@ -29,10 +29,10 @@ import ru.pin36bik.exceptions.PresetNotFoundException;
 import ru.pin36bik.service.PresetService;
 
 @RestController
-@RequestMapping(value = "/api/presets/v0",
+@RequestMapping(value = "/api/v0/presets",
         produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.APPLICATION_JSON_VALUE)
-@Tag(name = "Preset Controller",
+@Tag(name = "Preset API",
         description = "API для управления пресетами настроек окна")
 public class PresetController {
 
@@ -47,7 +47,7 @@ public class PresetController {
         this.kafkaTemplate = myKafkaTemplate;
     }
 
-    @Operation(summary = "Найти пресет по ID",
+    @Operation(summary = "Получить пресет по ID",
             description = "Возвращает пресет по указанному ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
@@ -55,7 +55,7 @@ public class PresetController {
             @ApiResponse(responseCode = "404",
                     description = "Пресет не найден")
     })
-    @GetMapping("/get-by-id/{id}")
+    @GetMapping("get-by-id/{id}")
     public ResponseEntity<PresetDTO> getPresetById(
             @Parameter(description = "ID пресета",
                     required = true, example = "1")
@@ -80,8 +80,8 @@ public class PresetController {
     public ResponseEntity<PresetDTO> createPreset(
             @Parameter(description = "Данные пресета в формате JSON",
                     required = true)
-            @Valid @RequestBody final PresetDTO preset_DTO) {
-        return ResponseEntity.ok(presetService.createPreset(preset_DTO));
+            @Valid @RequestBody final PresetDTO presetDTO) {
+        return ResponseEntity.ok(presetService.createPreset(presetDTO));
     }
 
     @Operation(summary = "Обновить пресет",
@@ -102,8 +102,8 @@ public class PresetController {
             @PathVariable final Long id,
             @Parameter(description = "Обновленные данные пресета",
                     required = true)
-            @Valid @RequestBody final PresetDTO preset_DTO) {
-        return ResponseEntity.ok(presetService.updatePreset(preset_DTO));
+            @Valid @RequestBody final PresetDTO presetDTO) {
+        return ResponseEntity.ok(presetService.updatePreset(presetDTO));
     }
 
     @Operation(summary = "Удалить пресет",
