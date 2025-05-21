@@ -42,8 +42,8 @@ docker-compose up microservice-analytics либо docker run -d --name presets -
 ./gradlew :microservice-analytics:run 
 
 ### Используемые переменные окружения:
-DB_USER_LOGIN=your_db_login
-DB_USER_PASSWORD=your_db_password
+BD_LOGIN=your_db_login
+BD_PASSWORD=your_db_password
 
 
 ## 4. API документация:
