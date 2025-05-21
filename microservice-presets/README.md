@@ -68,7 +68,7 @@ BD_PASSWORD=your_db_password
 
 В остальных случаях:
 
-```json
+```redoc
 {
   "openapi": "3.0.1",
   "info": {
