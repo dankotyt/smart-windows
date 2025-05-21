@@ -25,7 +25,7 @@ public interface PresetAnalyticsRepository
 
     @Modifying
     @Query("UPDATE PresetAnalytics p SET p.downloadsNumber = p.downloadsNumber + 1, "
-            + "p.downloadsNumber = :now "
+            + "p.downloadsNumber = :now " //<- пофиксить
             + "WHERE p.presetName = :presetName")
     void incrementDownloadsNumber(@Param("presetName") String presetName,
                                   @Param("now") LocalDateTime now);
