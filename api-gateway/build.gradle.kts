@@ -26,7 +26,14 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
 
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
+    implementation(platform("org.springframework.boot:spring-boot-dependencies:3.1.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.cloud:spring-cloud-starter-gateway")
+    testImplementation("io.projectreactor:reactor-test")
+    testImplementation("org.springframework:spring-webflux")
+    testImplementation("org.mockito:mockito-core")
+    testImplementation("org.mockito:mockito-junit-jupiter")
 
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.3")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.3")
