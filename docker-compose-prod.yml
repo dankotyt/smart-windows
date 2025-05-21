@@ -7,16 +7,18 @@ services:
       - .env
     environment:
       POSTGRES_DB: smart_windows
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${BD_LOGIN}
+      POSTGRES_PASSWORD: ${BD_PASSWORD}
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${BD_LOGIN}" ]
       interval: 5s
-      timeout: 3s
+      timeout: 5s
       retries: 5
 
   redis:
