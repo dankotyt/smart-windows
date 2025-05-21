@@ -99,7 +99,7 @@ class AnalyticsControllerTest {
         when(analyticsService.getPresetAnalytics("Evening Mode"))
                 .thenReturn(Optional.of(preset));
 
-        mockMvc.perform(get("/api/v0/analytics/presets/get-preset-by-name/Evening Mode"))
+        mockMvc.perform(get("/api/v0/analytics/presets/get-by-name/Evening Mode"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(2))
                 .andExpect(jsonPath("$.preset_name").value("Evening Mode"))
@@ -112,7 +112,7 @@ class AnalyticsControllerTest {
         when(analyticsService.getPresetAnalytics("Unknown"))
                 .thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/api/v0/analytics/presets/get-preset-by-name/Unknown"))
+        mockMvc.perform(get("/api/v0/analytics/presets/get-by-name/Unknown"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(""));
     }
@@ -196,7 +196,7 @@ class AnalyticsControllerTest {
         Mockito.when(analyticsService.getUserAnalytics(anyLong()))
                 .thenReturn(Optional.of(user));
 
-        mockMvc.perform(get("/api/v0/analytics/users/get-user-by-id/1"))
+        mockMvc.perform(get("/api/v0/analytics/users/get-by-id/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.user_id").value(1));
     }
@@ -206,7 +206,7 @@ class AnalyticsControllerTest {
         Mockito.when(analyticsService.getUserAnalytics(anyLong()))
                 .thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/api/v0/analytics/users/get-user-by-id/999"))
+        mockMvc.perform(get("/api/v0/analytics/users/get-by-id/999"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(""));
     }
