@@ -1,4 +1,4 @@
-FROM amazoncorretto:21 as builder
+FROM amazoncorretto:21 AS builder
 
 WORKDIR /app
 
@@ -7,15 +7,19 @@ COPY gradle ./gradle
 COPY microservice-user-management/build.gradle.kts ./microservice-user-management/
 COPY microservice-user-management/src ./microservice-user-management/src
 
-RUN ./gradlew :microservice-user-management:bootJar --no-daemon
+RUN ./gradlew :microservice-user-management:bootJar --no-daemon --info
 
-FROM amazoncorretto:21-jre
+FROM amazoncorretto:21
 
 WORKDIR /app
 
 COPY --from=builder /app/microservice-user-management/build/libs/*.jar app.jar
 
-RUN addgroup --system spring && adduser --system --ingroup spring spring
+RUN yum install -y shadow-utils && \
+    groupadd --system spring && \
+    useradd --system --gid spring spring && \
+    yum clean all
+
 USER spring:spring
 
 EXPOSE 8080
