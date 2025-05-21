@@ -33,8 +33,6 @@ dependencies {
     implementation("org.springframework.kafka:spring-kafka")
     implementation("io.jsonwebtoken:jjwt-api:0.12.3")
 
-    implementation(project(":microservice-presets"))
-
     compileOnly ("org.springframework.boot:spring-boot-starter-security")
     compileOnly("org.projectlombok:lombok")
 
