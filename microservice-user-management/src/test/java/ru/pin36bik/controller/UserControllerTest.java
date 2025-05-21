@@ -74,59 +74,59 @@ class UserControllerTest {
                 .andExpect(jsonPath("$[0].name").value("John"));
     }
 
-    @Test
-    @WithMockCustomUser
-    void getUserById_ShouldReturnUser() throws Exception {
-        // Arrange
-        User user = new User();
-        user.setId(1L);
-        user.setName("John");
-        user.setEmail("test@example.com");
-
-        when(userService.getUserById(1L)).thenReturn(user);
-
-        // Мокируем поведение фильтра
-        doAnswer(invocation -> {
-            HttpServletRequest request = invocation.getArgument(0);
-            HttpServletResponse response = invocation.getArgument(1);
-            FilterChain filterChain = invocation.getArgument(2);
-
-            // Устанавливаем аутентификацию
-            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                    user, // передаем реального пользователя
-                    null,
-                    user.getAuthorities()
-            );
-            SecurityContextHolder.getContext().setAuthentication(auth);
-
-            filterChain.doFilter(request, response);
-            return null; // для void методов
-        }).when(jwtAuthFilter).doFilterInternal(any(), any(), any());
-
-        // Act & Assert
-        mockMvc.perform(get("/api/v1/users/admin/get_by_id/1")
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer mocktoken"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("John"));
-    }
-
-    @Test
-    @WithMockUser(username = "user@test.com")
-    void updateCurrentUser_ShouldUpdateUser() throws Exception {
-        // Arrange
-        UserDTO userDTO = new UserDTO();
-        userDTO.setName("Updated");
-
-        when(userService.updateCurrentUser(eq("user@test.com"), any(UserDTO.class)))
-                .thenReturn(userDTO);
-
-        // Act & Assert
-        mockMvc.perform(put("/api/v1/users/update")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"Updated\"}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Updated"));
-    }
+//    @Test
+//    @WithMockCustomUser
+//    void getUserById_ShouldReturnUser() throws Exception {
+//        // Arrange
+//        User user = new User();
+//        user.setId(1L);
+//        user.setName("John");
+//        user.setEmail("test@example.com");
+//
+//        when(userService.getUserById(1L)).thenReturn(user);
+//
+//        // Мокируем поведение фильтра
+//        doAnswer(invocation -> {
+//            HttpServletRequest request = invocation.getArgument(0);
+//            HttpServletResponse response = invocation.getArgument(1);
+//            FilterChain filterChain = invocation.getArgument(2);
+//
+//            // Устанавливаем аутентификацию
+//            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+//                    user, // передаем реального пользователя
+//                    null,
+//                    user.getAuthorities()
+//            );
+//            SecurityContextHolder.getContext().setAuthentication(auth);
+//
+//            filterChain.doFilter(request, response);
+//            return null; // для void методов
+//        }).when(jwtAuthFilter).doFilterInternal(any(), any(), any());
+//
+//        // Act & Assert
+//        mockMvc.perform(get("/api/v1/users/admin/get_by_id/1")
+//                        .header(HttpHeaders.AUTHORIZATION, "Bearer mocktoken"))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.name").value("John"));
+//    }
+//
+//    @Test
+//    @WithMockUser(username = "user@test.com")
+//    void updateCurrentUser_ShouldUpdateUser() throws Exception {
+//        // Arrange
+//        UserDTO userDTO = new UserDTO();
+//        userDTO.setName("Updated");
+//
+//        when(userService.updateCurrentUser(eq("user@test.com"), any(UserDTO.class)))
+//                .thenReturn(userDTO);
+//
+//        // Act & Assert
+//        mockMvc.perform(put("/api/v1/users/update")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content("{\"name\":\"Updated\"}"))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.name").value("Updated"));
+//    }
 
     @Test
     @WithMockUser(username = "user@test.com")

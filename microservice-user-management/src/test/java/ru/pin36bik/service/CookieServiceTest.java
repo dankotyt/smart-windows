@@ -106,6 +106,6 @@ class CookieServiceTest {
                 .startsWith("test-cookie=;")
                 .contains("Path=/test-path;")
                 .contains("Max-Age=0;")
-                .containsPattern("Expires=.+"); // Проверяем наличие даты экспирации
+                .containsPattern("Expires=.+");
     }
 }
