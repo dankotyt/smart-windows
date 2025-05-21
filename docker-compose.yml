@@ -9,14 +9,14 @@ services:
       POSTGRES_DB: smart_windows
       POSTGRES_USER: ${BD_LOGIN}
       POSTGRES_PASSWORD: ${BD_PASSWORD}
-      POSTGRES_MULTIPLE_DATABASES: "users_db,weather_db,windows_db"
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${BD_LOGIN} -d smart_windows"]
+      test: [ "CMD-SHELL", "pg_isready -U ${BD_LOGIN}" ]
       interval: 5s
       timeout: 5s
       retries: 5
