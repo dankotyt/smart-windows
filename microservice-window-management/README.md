@@ -35,7 +35,7 @@
 ### Docker:
 cd microservice-window-management/
 docker build -t window-management-service .
-docker-compose up microservice-window-management либо docker run -d --name window -p 8082:8080 window-management-service
+docker-compose up microservice-window-management либо docker run -d --name window -p 8083:8080 window-management-service
 
 ### Локально:
 ./gradlew :microservice-window-management:run 
