@@ -1,0 +1,23 @@
+#!/bin/sh
+# Это должен быть файл .git/hooks/pre-commit без расширения
+# Первые две строки обеспечивают запуск через cmd.exe в Windows
+
+# Проверяем, что запускаем из Windows
+if [ -f /proc/version ] && grep -q Microsoft /proc/version; then
+  exec cmd.exe /C "$0.bat"
+  exit 0
+fi
+
+# Если не Windows - выполняем оригинальный скрипт
+echo Running microservice tests...
+
+./gradlew :microservice-presets:test :microservice-analytics:test
+
+if [ $? -ne 0 ]; then
+  echo
+  echo "[ERROR] Tests failed! Commit aborted."
+  exit 1
+fi
+
+echo All tests passed!
+exit 0
