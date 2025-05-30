@@ -20,6 +20,9 @@ java {
 dependencies {
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("com.h2database:h2")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
@@ -31,11 +34,13 @@ dependencies {
     implementation("org.projectlombok:lombok")
     implementation("org.modelmapper:modelmapper:2.4.4")
     implementation("io.github.cdimascio:dotenv-java:3.0.0")
-    annotationProcessor("org.projectlombok:lombok")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
     implementation("com.fasterxml.jackson.core:jackson-databind")
-    testImplementation("com.h2database:h2")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+
+    annotationProcessor("org.projectlombok:lombok")
+
+    compileOnly ("org.springframework.boot:spring-boot-starter-security")
 }
 
 tasks.test {
