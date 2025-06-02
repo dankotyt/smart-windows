@@ -24,7 +24,7 @@ spring:
             topics:
               enable=true
   datasource:
-    url: jdbc:postgresql://localhost:5432/weather_db?currentSchema=public
+    url: jdbc:postgresql://postgres:5432/weather_db?currentSchema=public
     username: ${WEATHER_DB_LOGIN}
     password: ${WEATHER_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver

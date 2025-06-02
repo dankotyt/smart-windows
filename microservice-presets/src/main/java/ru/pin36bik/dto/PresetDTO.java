@@ -6,11 +6,15 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Schema(
         description = "Конфигурация пресета настроек окна")
 public class PresetDTO {
@@ -57,20 +61,4 @@ public class PresetDTO {
     @JsonProperty("frame_color")
     @NotNull(message = "Цвет подсветки обязателен")
     private Integer frameColor;
-
-    public PresetDTO() {
-    }
-
-    public PresetDTO(final Long myId, final String myPresetName,
-                     final Boolean myVentilationFlag,
-                     final Integer myVentilationTimer,
-                     final Integer myDarknessValue,
-                     final Integer myFrameColor) {
-        this.id = myId;
-        this.presetName = myPresetName;
-        this.ventilationFlag = myVentilationFlag;
-        this.ventilationTimer = myVentilationTimer;
-        this.darknessValue = myDarknessValue;
-        this.frameColor = myFrameColor;
-    }
 }

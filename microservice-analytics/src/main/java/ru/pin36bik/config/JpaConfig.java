@@ -55,7 +55,7 @@ public class JpaConfig {
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setUrl("jdbc:postgresql://localhost:5432/smart_windows");
+        dataSource.setUrl("jdbc:postgresql://postgres:5432/smart_windows");
         dataSource.setUsername(dotenv.get("BD_LOGIN"));
         dataSource.setPassword(dotenv.get("BD_PASSWORD"));
         return dataSource;

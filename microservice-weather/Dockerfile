@@ -5,7 +5,7 @@ WORKDIR /app
 COPY build.gradle.kts settings.gradle.kts gradlew ./
 COPY gradle ./gradle
 COPY microservice-weather/build.gradle.kts ./microservice-weather/
-COPY microservice-notifications/src ./microservice-weather/src
+COPY microservice-weather/src ./microservice-weather/src
 
 RUN ./gradlew :microservice-weather:bootJar --no-daemon
 

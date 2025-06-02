@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/windows_db?currentSchema=public
+    url: jdbc:postgresql://postgres:5432/windows_db?currentSchema=public
     username: ${WINDOW_DB_LOGIN}
     password: ${WINDOW_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
