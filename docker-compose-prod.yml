@@ -3,6 +3,8 @@ services:
   postgres:
     image: postgres:17.4
     container_name: postgres
+    networks:
+      - smart-net
     env_file:
       - .env
     environment:
@@ -24,6 +26,8 @@ services:
   redis:
     image: redis:7
     container_name: redis
+    networks:
+      - smart-net
     env_file:
       - .env
     command: redis-server
@@ -41,6 +45,8 @@ services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
     container_name: zookeeper
+    networks:
+      - smart-net
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -50,6 +56,8 @@ services:
   kafka:
     image: confluentinc/cp-kafka:7.3.0
     container_name: kafka
+    networks:
+      - smart-net
     depends_on:
       - zookeeper
     ports:
@@ -78,6 +86,8 @@ services:
     # container_name: api-gateway
     ports:
       - "8080:8080"
+    networks:
+      - smart-net
     env_file:
       - .env
     volumes:
@@ -92,8 +102,10 @@ services:
   analytics-service:
     image: smart-windows-analytics-service:${TAG:-latest}
     # container_name: analytics-service
-    ports:
-      - "8084:8080"
+#    ports:
+#      - "8084:8080"
+    networks:
+      - smart-net
     env_file:
       - .env
     volumes:
@@ -108,8 +120,10 @@ services:
   user-management-service:
     image: smart-windows-user-management-service:${TAG:-latest}
     # container_name: user-management-service
-    ports:
-      - "8082:8080"
+#    ports:
+#      - "8082:8080"
+    networks:
+      - smart-net
     env_file:
       - .env
     volumes:
@@ -124,8 +138,10 @@ services:
   preset-service:
     image: smart-windows-presets-service:${TAG:-latest}
     # container_name: preset-service
-    ports:
-      - "8086:8080"
+#    ports:
+#      - "8086:8080"
+    networks:
+      - smart-net
     env_file:
       - .env
     volumes:
@@ -142,8 +158,10 @@ services:
   weather-service:
     image: smart-windows-weather-service:${TAG:-latest}
     # container_name: weather-service
-    ports:
-      - "8088:8080"
+#    ports:
+#      - "8088:8080"
+    networks:
+      - smart-net
     env_file:
       - .env
     volumes:
@@ -158,8 +176,10 @@ services:
   window-management-service:
     image: smart-windows-window-management-service:${TAG:-latest}
     # container_name: window-management-service
-    ports:
-      - "8083:8080"
+#    ports:
+#      - "8083:8080"
+    networks:
+      - smart-net
     env_file:
       - .env
     volumes:
@@ -173,6 +193,8 @@ services:
   # Мониторинг
   prometheus:
     image: prom/prometheus
+    networks:
+      - smart-net
     ports:
       - "9090:9090"
     volumes:
@@ -185,12 +207,18 @@ services:
 
   grafana:
     image: grafana/grafana
+    networks:
+      - smart-net
     ports:
       - "3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
     depends_on:
       - prometheus
+
+networks:
+  smart-net:
+    driver: bridge
 
 volumes:
   postgres_data:

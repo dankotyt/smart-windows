@@ -25,6 +25,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private static final String AUTH_HEADER = "Authorization";
     private static final String TOKEN_PREFIX = "Bearer ";
     private static final String REFRESH_TOKEN_COOKIE = "__Host-refresh";
+    private static final String AUTH_TOKEN_COOKIE = "__Host-auth-token";
 
     private final JwtTokenParser jwtTokenParser;
     private final UserRepository userRepository;
@@ -93,7 +94,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if ("_Host-auth-token".equals(cookie.getName())) {
+                if (AUTH_TOKEN_COOKIE.equals(cookie.getName())) {
                     return cookie.getValue();
                 }
             }

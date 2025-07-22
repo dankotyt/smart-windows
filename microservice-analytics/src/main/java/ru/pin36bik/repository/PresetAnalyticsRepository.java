@@ -11,13 +11,9 @@ import org.springframework.stereotype.Repository;
 import ru.pin36bik.entity.PresetAnalytics;
 
 @Repository
-public interface PresetAnalyticsRepository
-        extends JpaRepository<PresetAnalytics, String> {
+public interface PresetAnalyticsRepository extends JpaRepository<PresetAnalytics, String> {
 
-    @Query("SELECT p FROM PresetAnalytics p "
-            + "WHERE LOWER(p.presetName) = LOWER(:presetName)")
-    List<PresetAnalytics> findByPresetName(
-            @Param("presetName") String presetName);
+    List<PresetAnalytics> findByPresetName(String presetName);
 
     @Query("SELECT p FROM PresetAnalytics p "
             + "ORDER BY p.downloadsNumber DESC LIMIT 1")

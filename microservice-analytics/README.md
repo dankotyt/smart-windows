@@ -63,7 +63,7 @@ BD_PASSWORD=your_db_password
 
 ## 6. API документация:
 
-При запущенном AnalyticsApplication: http://localhost:8084/swagger-ui.html
+При запущенном AnalyticsApplication: http://analytics-service:8084/swagger-ui.html
 
 В остальных случаях:
 
@@ -77,7 +77,7 @@ BD_PASSWORD=your_db_password
   },
   "servers": [
     {
-      "url": "http://localhost:8080",
+      "url": "http://analytics-service:8084",
       "description": "Generated server url"
     }
   ],

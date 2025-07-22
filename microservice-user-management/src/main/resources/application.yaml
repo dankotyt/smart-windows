@@ -26,9 +26,9 @@ logging:
     org.springframework.web: DEBUG
     ru.pin36bik: DEBUG
 
-server:
-  port: 8082
+#server:
+#  port: 8082
 
 window:
   service:
-    url: http://localhost:8083
+    url: http://window-management-service:8080 #8083

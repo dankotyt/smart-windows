@@ -19,7 +19,6 @@ public class RegisterRequest {
     private String name;
     private String surname;
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
     @Past
     private LocalDate birthday;
 

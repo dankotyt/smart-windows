@@ -56,6 +56,10 @@ public class AuthService {
 
     public LoginResponse refreshToken(String refreshToken) {
 
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            throw new InvalidTokenException("Refresh токен пустой!");
+        }
+
         if (jwtTokenParser.isTokenRevoked(refreshToken)) {
             throw new InvalidTokenException("Token revoked");
         }
@@ -63,10 +67,6 @@ public class AuthService {
         String email = jwtTokenParser.extractUsername(refreshToken);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
-
-        if (refreshToken == null || refreshToken.isEmpty()) {
-            throw new InvalidTokenException("Refresh токен пустой!");
-        }
 
         if (!refreshToken.equals(user.getRefreshToken())) {
             throw new InvalidTokenException("Несоответствие refresh токена");
@@ -77,7 +77,7 @@ public class AuthService {
                     user.getRefreshTokenExpiry().isBefore(LocalDateTime.now())) {
                 throw new InvalidTokenException("Срок действия refresh токена истек");
             }
-            throw new InvalidTokenException("Refresh токен недействителен или истек");
+            throw new InvalidTokenException("Refresh токен недействителен");
         }
         LoginResponse tokens = jwtService.generateTokenPair(user);
         jwtTokenParser.revokeToken(refreshToken);

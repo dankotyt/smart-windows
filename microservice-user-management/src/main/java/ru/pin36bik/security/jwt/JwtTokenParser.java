@@ -48,12 +48,10 @@ public class JwtTokenParser {
     public boolean isTokenValid(String token, User user) {
         try {
             final String username = extractUsername(token);
-            boolean isBasicValid = username.equals(user.getEmail())
+            return username.equals(user.getEmail())
                     && !isTokenExpired(token)
                     && !isTokenRevoked(token);
 
-
-            return isBasicValid;
         } catch (Exception e) {
             log.error("Token validation failed", e);
             return false;

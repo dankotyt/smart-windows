@@ -60,7 +60,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/refresh").authenticated()
                         .requestMatchers("/api/v1/auth/logout").authenticated()
                         .requestMatchers("/api/v1/users/**").authenticated()
-                        //.requestMatchers("/api/windows/**").authenticated()// Удалить в production
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception
@@ -101,7 +100,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        var authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService());
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;

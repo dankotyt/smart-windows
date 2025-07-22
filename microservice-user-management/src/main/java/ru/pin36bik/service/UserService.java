@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements UserDetailsService {
+public class UserService {
 
     private final UserRepository userRepository;
     private final ArchivedUserRepository archivedUserRepository;
@@ -92,11 +92,5 @@ public class UserService implements UserDetailsService {
         au.setCreatedAt(user.getCreatedAt());
         archivedUserRepository.save(au);
         userRepository.delete(user);
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден с таким email: " + email));
     }
 }

@@ -9,19 +9,19 @@ spring:
     gateway:
       routes:
         - id: microservice-user-management
-          uri: http://localhost:8082
+          uri: http://user-management-service:8080 #8082
           predicates:
             - Path=/api/v1/users/**
           filters:
             - GatewayJwtFilter
 
         - id: microservice-user-management
-          uri: http://localhost:8082
+          uri: http://user-management-service:8080 #8082
           predicates:
             - Path=/api/v1/auth/**
 
         - id: microservice-window-management
-          uri: http://localhost:8083
+          uri: http://window-management-service:8080 #8083
           predicates:
             - Path=/api/v1/windows/**
           filters:
@@ -30,35 +30,35 @@ spring:
                 secret: ${JWT_SECRET}
 
         - id: microservice-analytics
-          uri: http://localhost:8084
+          uri: http://analytics-service:8080 #8084
           predicates:
             - Path=/api/v1/analytics/**
           filters:
             - GatewayJwtFilter
 
         - id: microservice-notifications
-          uri: http://localhost:8085
+          uri: http://localhost:8080 #8085
           predicates:
             - Path=/api/v1/notifications/**
           filters:
             - GatewayJwtFilter
 
         - id: microservice-presets
-          uri: http://localhost:8086
+          uri: http://presets-service:8080 #8086
           predicates:
             - Path=/api/v1/presets/**
           filters:
             - GatewayJwtFilter
 
         - id: microservice-visual-content
-          uri: http://localhost:8087
+          uri: http://localhost:8080 #8087
           predicates:
             - Path=/api/v1/visual/**
           filters:
             - GatewayJwtFilter
 
         - id: microservice-weather
-          uri: http://localhost:8088
+          uri: http://weather-service:8080 #8088
           predicates:
             - Path=/api/v1/weather/**
           filters:

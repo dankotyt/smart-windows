@@ -47,7 +47,7 @@ public class GatewayJwtFilter implements GatewayFilterFactory<GatewayJwtFilter.C
             }
             log.info("Validating token with auth service: {}", accessToken);
             return webClient.get()
-                    .uri("http://localhost:8082/api/v1/auth/validate")
+                    .uri("http://user-management-service:8080/api/v1/auth/validate")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                     .exchangeToMono(clientResponse -> {
                         log.info("Validation response status: {}", clientResponse.statusCode());

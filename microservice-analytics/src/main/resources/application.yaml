@@ -10,6 +10,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
@@ -25,5 +28,5 @@ springdoc:
     path: /api-docs
   show-actuator: true
 
-server:
-  port: 8084
+#server:
+#  port: 8084

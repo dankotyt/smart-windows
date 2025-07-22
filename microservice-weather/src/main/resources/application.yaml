@@ -1,5 +1,5 @@
-server:
-  port: 8088
+#server:
+#  port: 8088
 
 YWAPI_KEY: ${YWAPI_KEY}
 
@@ -25,8 +25,8 @@ spring:
               enable=true
   datasource:
     url: jdbc:postgresql://postgres:5432/weather_db?currentSchema=public
-    username: ${WEATHER_DB_LOGIN}
-    password: ${WEATHER_DB_PASSWORD}
+    username: ${ALL_PRIVILEGES_USER_LOGIN} #${WEATHER_DB_LOGIN}
+    password: ${ALL_PRIVILEGES_USER_PASSWORD} #${WEATHER_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

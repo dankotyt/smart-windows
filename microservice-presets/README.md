@@ -37,7 +37,7 @@
 ### Docker:
 cd microservice-presets/
 docker build -t presets-service .
-docker-compose up microservice-presets либо docker run -d --name presets -p 8082:8080 presets-service
+docker-compose up microservice-presets либо docker run -d --name presets -p 8086:8080 presets-service
 
 ### Локально:
 ./gradlew :microservice-presets:run 
@@ -64,7 +64,7 @@ BD_PASSWORD=your_db_password
 
 ## 6. API документация:
 
-При запущенном PresetsApplication доступна по адресу: http://localhost:8086/swagger-ui.html
+При запущенном PresetsApplication доступна по адресу: http://presets-service:8086/swagger-ui.html
 
 В остальных случаях:
 
@@ -78,7 +78,7 @@ BD_PASSWORD=your_db_password
   },
   "servers": [
     {
-      "url": "http://localhost:8086",
+      "url": "http://presets-service:8086",
       "description": "Generated server url"
     }
   ],

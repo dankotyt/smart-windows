@@ -11,8 +11,7 @@ import org.springframework.stereotype.Repository;
 import ru.pin36bik.entity.UserAnalytics;
 
 @Repository
-public interface UserAnalyticsRepository
-        extends JpaRepository<UserAnalytics, Long> {
+public interface UserAnalyticsRepository extends JpaRepository<UserAnalytics, Long> {
     List<UserAnalytics> findByUserId(Long userId);
 
     @Query("SELECT u FROM UserAnalytics u ORDER BY u.lastLogin ASC LIMIT 1")
