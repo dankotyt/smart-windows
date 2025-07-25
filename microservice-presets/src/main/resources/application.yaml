@@ -1,19 +1,23 @@
 spring:
   datasource:
-    url: jdbc:postgresql://postgres:5432/smart_windows
-    username: ${BD_LOGIN}
-    password: ${BD_PASSWORD}
+    url: jdbc:postgresql://postgres:5432/presets_db
+    username: ${PRESETS_DB_LOGIN}
+    password: ${PRESETS_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+    properties:
+      hibernate:
+        default_schema: public
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   cache:
     type: redis
     redis:
       time-to-live: 600000
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: kafka:9092 # т.к. такое название докер-контейнера
     consumer:
       group-id: test-consumer-group
       auto-offset-reset: earliest
@@ -24,7 +28,7 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
   data:
     redis:
-      host: localhost
+      host: redis # т.к. такое название докер-контейнера
       database: 0
       port: 6379
 

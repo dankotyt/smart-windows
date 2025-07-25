@@ -87,8 +87,8 @@ YWAPI_KEY: ${YWAPI_KEY}
 
 logging:
   level:
-    ru.pin36bik: DEBUG  # Для вашего фильтра
-    org.springframework.cloud.gateway: TRACE # Для детальных логов Gateway
+    ru.pin36bik: DEBUG
+    org.springframework.cloud.gateway: TRACE
 
 server:
   port: 8080

@@ -8,15 +8,30 @@ services:
     env_file:
       - .env
     environment:
-      POSTGRES_DB: smart_windows
       POSTGRES_USER: ${BD_LOGIN}
       POSTGRES_PASSWORD: ${BD_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      USER_DB_LOGIN: ${USER_DB_LOGIN}
+      USER_DB_PASSWORD: ${USER_DB_PASSWORD}
+      WINDOW_DB_LOGIN: ${WINDOW_DB_LOGIN}
+      WINDOW_DB_PASSWORD: ${WINDOW_DB_PASSWORD}
+      WEATHER_DB_LOGIN: ${WEATHER_DB_LOGIN}
+      WEATHER_DB_PASSWORD: ${WEATHER_DB_PASSWORD}
+      PRESETS_DB_LOGIN: ${PRESETS_DB_LOGIN}
+      PRESETS_DB_PASSWORD: ${PRESETS_DB_PASSWORD}
+      ANALYTICS_DB_LOGIN: ${ANALYTICS_DB_LOGIN}
+      ANALYTICS_DB_PASSWORD: ${ANALYTICS_DB_PASSWORD}
       POSTGRES_HOST_AUTH_METHOD: scram-sha-256
-    ports:
-      - "5432:5432"
+    expose:
+      - "5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+      - ./init-db-scripts/init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh
+    command: >
+      bash -c "
+        chmod +x /docker-entrypoint-initdb.d/init-multiple-dbs.sh
+        exec docker-entrypoint.sh postgres
+      "
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${BD_LOGIN}" ]
       interval: 5s
@@ -29,9 +44,10 @@ services:
     container_name: redis
     networks:
       - smart-net
-    ports:
-      - "6379:6379"
-    command: redis-server
+    expose:
+      - "6379"
+    command:
+      - redis-server
     volumes:
       - redis_data:/data
     healthcheck:
@@ -49,8 +65,8 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "2181:2181"
+    expose:
+      - "2181"
 
   kafka:
     image: confluentinc/cp-kafka:7.3.0
@@ -86,15 +102,17 @@ services:
     container_name: analytics-service
 #    ports:
 #      - "8084:8080"
+    expose:
+      - 8080
     networks:
       - smart-net
     env_file:
       - .env
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/smart_windows
-      SPRING_DATASOURCE_USERNAME: ${BD_LOGIN}
-      SPRING_DATASOURCE_PASSWORD: ${BD_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/analytics_db
+      SPRING_DATASOURCE_USERNAME: ${ANALYTICS_DB_LOGIN}
+      SPRING_DATASOURCE_PASSWORD: ${ANALYTICS_DB_PASSWORD}
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     volumes:
       - ./.env:/app/.env
@@ -128,15 +146,17 @@ services:
     container_name: presets-service
 #    ports:
 #      - "8086:8080"
+    expose:
+      - 8080
     networks:
       - smart-net
     env_file:
       - .env
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/smart_windows
-      SPRING_DATASOURCE_USERNAME: ${BD_LOGIN}
-      SPRING_DATASOURCE_PASSWORD: ${BD_PASSWORD}
-      SPRING_REDIS_HOST: redis
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/presets_db
+      SPRING_DATASOURCE_USERNAME: ${PRESETS_DB_LOGIN}
+      SPRING_DATASOURCE_PASSWORD: ${PRESETS_DB_PASSWORD}
+      SPRING_REDIS_HOST: ${REDIS_HOST}
       SPRING_REDIS_PASSWORD: ${REDIS_PASSWORD}
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     volumes:
@@ -154,25 +174,23 @@ services:
     build:
       context: .
       dockerfile: microservice-user-management/Dockerfile
-    container_name: user-management-service
-#    ports:
-#      - "8082:8080"
     networks:
       - smart-net
     env_file:
       - .env
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/users_db?currentSchema=public
-      SPRING_DATASOURCE_USERNAME: ${ALL_PRIVILEGES_USER_LOGIN}
-      SPRING_DATASOURCE_PASSWORD: ${ALL_PRIVILEGES_USER_PASSWORD}
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_ACCESS_TTL: ${JWT_ACCESS_TTL}
-      JWT_REFRESH_TTL: ${JWT_REFRESH_TTL}
-      WINDOW_SERVICE_URL: http://window-management-service:8080 #8083
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/users_db
+      SPRING_DATASOURCE_USERNAME: ${USER_DB_LOGIN}
+      SPRING_DATASOURCE_PASSWORD: ${USER_DB_PASSWORD}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     volumes:
       - ./.env:/app/.env
+    expose:
+      - "8080"
     depends_on:
       postgres:
+        condition: service_healthy
+      kafka:
         condition: service_healthy
 
 #  # Visual Content Service
@@ -192,21 +210,20 @@ services:
     build:
       context: .
       dockerfile: microservice-weather/Dockerfile
-    container_name: weather-service
-#    ports:
-#      - "8088:8080"
     networks:
       - smart-net
     env_file:
       - .env
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/weather_db?currentSchema=public
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/weather_db
       SPRING_DATASOURCE_USERNAME: ${WEATHER_DB_LOGIN}
       SPRING_DATASOURCE_PASSWORD: ${WEATHER_DB_PASSWORD}
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       YWAPI_KEY: ${YWAPI_KEY}
     volumes:
       - ./.env:/app/.env
+    expose:
+      - "8080"
     depends_on:
       postgres:
         condition: service_healthy
@@ -218,23 +235,19 @@ services:
     build:
       context: .
       dockerfile: microservice-window-management/Dockerfile
-    container_name: window-management-service
-#    ports:
-#      - "8083:8080"
     networks:
       - smart-net
     env_file:
       - .env
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/windows_db?currentSchema=public
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/windows_db
       SPRING_DATASOURCE_USERNAME: ${WINDOW_DB_LOGIN}
       SPRING_DATASOURCE_PASSWORD: ${WINDOW_DB_PASSWORD}
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_ACCESS_TTL: ${JWT_ACCESS_TTL}
-      JWT_REFRESH_TTL: ${JWT_REFRESH_TTL}
     volumes:
       - ./.env:/app/.env
+    expose:
+      - "8080"
     depends_on:
       postgres:
         condition: service_healthy

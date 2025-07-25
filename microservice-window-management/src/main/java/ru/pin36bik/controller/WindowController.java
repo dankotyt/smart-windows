@@ -44,6 +44,7 @@ public class WindowController {
         return ResponseEntity.ok(windowService.updateWindow(request, userEmail, windowId));
     }
 
+    //обновить
     @GetMapping("/user/{userEmail}")
     public ResponseEntity<List<WindowUserDTO>> getWindowsByUserEmail(
             @RequestHeader("X-User-Email") String userEmail,

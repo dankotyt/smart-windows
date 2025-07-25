@@ -3,9 +3,9 @@
 
 spring:
   datasource:
-    url: jdbc:postgresql://postgres:5432/windows_db?currentSchema=public
-    username: ${ALL_PRIVILEGES_USER_LOGIN} #${WINDOW_DB_LOGIN}
-    password: ${ALL_PRIVILEGES_USER_PASSWORD} #${WINDOW_DB_PASSWORD}
+    url: jdbc:postgresql://postgres:5432/windows_db
+    username: ${WINDOW_DB_LOGIN}
+    password: ${WINDOW_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -18,7 +18,7 @@ spring:
         default_schema: public
     database: postgresql
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: kafka:9092
     consumer:
       group-id: window--group
       auto-offset-reset: earliest
@@ -31,6 +31,6 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 jwt:
-  secret: ${JWT_SECRET}
+  secret: ${F}
   access-ttl: ${JWT_ACCESS_TTL}
   refresh-ttl: ${JWT_REFRESH_TTL}

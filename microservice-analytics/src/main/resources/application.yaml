@@ -2,9 +2,9 @@ spring:
   profiles:
     active: dev
   datasource:
-    url: jdbc:postgresql://postgres:5432/smart_windows
-    username: ${BD_LOGIN}
-    password: ${BD_PASSWORD}
+    url: jdbc:postgresql://postgres:5432/analytics_db
+    username: ${ANALYTICS_DB_LOGIN}
+    password: ${ANALYTICS_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -13,8 +13,10 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        default_schema: public
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: kafka:9092
     consumer:
       group-id: test-consumer-group
       auto-offset-reset: earliest

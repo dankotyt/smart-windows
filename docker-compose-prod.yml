@@ -8,20 +8,35 @@ services:
     env_file:
       - .env
     environment:
-      POSTGRES_DB: smart_windows
       POSTGRES_USER: ${BD_LOGIN}
       POSTGRES_PASSWORD: ${BD_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      USER_DB_LOGIN: ${USER_DB_LOGIN}
+      USER_DB_PASSWORD: ${USER_DB_PASSWORD}
+      WINDOW_DB_LOGIN: ${WINDOW_DB_LOGIN}
+      WINDOW_DB_PASSWORD: ${WINDOW_DB_PASSWORD}
+      WEATHER_DB_LOGIN: ${WEATHER_DB_LOGIN}
+      WEATHER_DB_PASSWORD: ${WEATHER_DB_PASSWORD}
+      PRESETS_DB_LOGIN: ${PRESETS_DB_LOGIN}
+      PRESETS_DB_PASSWORD: ${PRESETS_DB_PASSWORD}
+      ANALYTICS_DB_LOGIN: ${ANALYTICS_DB_LOGIN}
+      ANALYTICS_DB_PASSWORD: ${ANALYTICS_DB_PASSWORD}
       POSTGRES_HOST_AUTH_METHOD: scram-sha-256
-    ports:
-      - "5432:5432"
+    expose:
+      - "5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+      - ./init-db-scripts/init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh
+    command: >
+      bash -c "
+        chmod +x /docker-entrypoint-initdb.d/init-multiple-dbs.sh
+        exec docker-entrypoint.sh postgres
+      "
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${BD_LOGIN}" ]
-      interval: 5s
+      test: [ "CMD-SHELL", "pg_isready -U ${BD_LOGIN}" ]  # Проверяем только основное подключение
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 3
 
   redis:
     image: redis:7
@@ -31,8 +46,8 @@ services:
     env_file:
       - .env
     command: redis-server
-    ports:
-      - "6379:6379"
+    expose:
+      - "6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -50,8 +65,8 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "2181:2181"
+    expose:
+      - "2181"
 
   kafka:
     image: confluentinc/cp-kafka:7.3.0
@@ -60,9 +75,9 @@ services:
       - smart-net
     depends_on:
       - zookeeper
-    ports:
-      - "9092:9092"
-      - "29092:29092"
+    expose:
+      - "9092"
+      - "29092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -104,6 +119,8 @@ services:
     # container_name: analytics-service
 #    ports:
 #      - "8084:8080"
+    expose:
+      - 8080
     networks:
       - smart-net
     env_file:
@@ -122,6 +139,8 @@ services:
     # container_name: user-management-service
 #    ports:
 #      - "8082:8080"
+    expose:
+      - 8080
     networks:
       - smart-net
     env_file:
@@ -140,6 +159,8 @@ services:
     # container_name: preset-service
 #    ports:
 #      - "8086:8080"
+    expose:
+      - 8080
     networks:
       - smart-net
     env_file:
@@ -160,6 +181,8 @@ services:
     # container_name: weather-service
 #    ports:
 #      - "8088:8080"
+    expose:
+      - 8080
     networks:
       - smart-net
     env_file:
@@ -178,6 +201,8 @@ services:
     # container_name: window-management-service
 #    ports:
 #      - "8083:8080"
+    expose:
+      - 8080
     networks:
       - smart-net
     env_file:
